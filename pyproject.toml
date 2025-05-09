@@ -6,7 +6,7 @@ keywords = ["image", "resize", "compression", "cli", "optimize"]
 license = { text = "MIT License" }
 name = "imgbytesizer"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 version = "0.1.0"
 
 [project.scripts]

@@ -128,7 +128,7 @@ imgbytesizer profile_pic.jpg 400KB --min-dimension 400
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.9+
 - Dependencies:
   - Pillow >= 11.0.0
   - tabulate >= 0.9.0
