@@ -1,6 +1,7 @@
 """
 Command-line interface for imgbytesizer.
 """
+
 import sys
 import argparse
 import logging
@@ -17,7 +18,7 @@ def main():
     logger = setup_logger()
 
     parser = argparse.ArgumentParser(
-        description='Resize an image to match a target file size',
+        description="Resize an image to match a target file size",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -26,19 +27,30 @@ Examples:
   %(prog)s image.jpg 100KB -f webp           # Resize and convert to WebP
   %(prog)s large.jpg 50KB --min-dimension 200  # Ensure min dimension is 200px
   %(prog)s -v                                # Show version information
-    """
+    """,
     )
 
-    parser.add_argument('image_path', nargs='?', help='Path to the input image')
-    parser.add_argument('target_size', nargs='?', help='Target file size (e.g., "1MB", "500KB")')
-    parser.add_argument('-o', '--output', help='Output path (default: input_resized.ext)')
-    parser.add_argument('-f', '--format', choices=IMG_FORMATS, help='Output format')
-    parser.add_argument('--min-dimension', type=int, help='Minimum width/height in pixels')
-    parser.add_argument('--no-exact', action='store_true',
-                        help='Do not pad file to get exact target size')
-    parser.add_argument('-v', '--version', action='store_true', help='Show version information')
-    parser.add_argument('--debug', action='store_true', help='Enable debug logging')
-    parser.add_argument('-q', '--quiet', action='store_true', help='Minimal output')
+    parser.add_argument("image_path", nargs="?", help="Path to the input image")
+    parser.add_argument(
+        "target_size", nargs="?", help='Target file size (e.g., "1MB", "500KB")'
+    )
+    parser.add_argument(
+        "-o", "--output", help="Output path (default: input_resized.ext)"
+    )
+    parser.add_argument("-f", "--format", choices=IMG_FORMATS, help="Output format")
+    parser.add_argument(
+        "--min-dimension", type=int, help="Minimum width/height in pixels"
+    )
+    parser.add_argument(
+        "--no-exact",
+        action="store_true",
+        help="Do not pad file to get exact target size",
+    )
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Show version information"
+    )
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
+    parser.add_argument("-q", "--quiet", action="store_true", help="Minimal output")
 
     # Handle version flag before checking required arguments
     args = parser.parse_args()
@@ -46,6 +58,7 @@ Examples:
     # Handle version request
     if args.version:
         from . import __version__
+
         print(f"imgbytesizer v{__version__}")
         return 0
 
@@ -80,7 +93,7 @@ Examples:
             args.format,
             args.min_dimension,
             exact_size=not args.no_exact,
-            quiet=args.quiet
+            quiet=args.quiet,
         )
 
         logger.debug(f"Successfully processed image: {output_path}")

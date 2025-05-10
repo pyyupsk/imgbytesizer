@@ -1,6 +1,7 @@
 """
 Terminal formatting utilities for imgbytesizer.
 """
+
 import sys
 import logging
 from tabulate import tabulate
@@ -18,19 +19,22 @@ def format_filesize(size_bytes, precision=2):
         return f"{size_bytes/(1024*1024):.{precision}f} MB"
 
 
-def print_progress_bar(progress, total, prefix='', suffix='', length=30):
+def print_progress_bar(progress, total, prefix="", suffix="", length=30):
     """Print a progress bar with percentage."""
     if not sys.stdout.isatty():
         return  # Don't print progress bars if not in a terminal
 
     percent = min(100, int(100.0 * progress / total))
     filled_length = int(length * progress // total)
-    bar = '█' * filled_length + '░' * (length - filled_length)
+    bar = "█" * filled_length + "░" * (length - filled_length)
 
     if Colors.supports_color():
-        print(f"\r{prefix} |{Colors.GREEN}{bar}{Colors.ENDC}| {percent}% {suffix}", end='\r')
+        print(
+            f"\r{prefix} |{Colors.GREEN}{bar}{Colors.ENDC}| {percent}% {suffix}",
+            end="\r",
+        )
     else:
-        print(f"\r{prefix} |{bar}| {percent}% {suffix}", end='\r')
+        print(f"\r{prefix} |{bar}| {percent}% {suffix}", end="\r")
 
     if progress == total:
         print()
@@ -39,11 +43,11 @@ def print_progress_bar(progress, total, prefix='', suffix='', length=30):
 def print_result(name, value, status=None):
     """Print a name-value pair with optional status color."""
     value_color = Colors.ENDC
-    if status == 'good':
+    if status == "good":
         value_color = Colors.GREEN
-    elif status == 'warning':
+    elif status == "warning":
         value_color = Colors.YELLOW
-    elif status == 'bad':
+    elif status == "bad":
         value_color = Colors.RED
 
     if Colors.supports_color():
@@ -55,7 +59,7 @@ def print_result(name, value, status=None):
 def print_processing_step(step, description):
     """Print a processing step with a spinner."""
     if not sys.stdout.isatty():
-        logger = logging.getLogger('imgbytesizer')
+        logger = logging.getLogger("imgbytesizer")
         logger.info(description)
         return
 
@@ -67,12 +71,13 @@ def print_processing_step(step, description):
         print(f"* {description}")
 
 
-def print_comparison_table(original_size, original_dimensions,
-                           final_size, final_dimensions, target_size):
+def print_comparison_table(
+    original_size, original_dimensions, final_size, final_dimensions, target_size
+):
     """Print comparison table between original and processed image."""
     if not sys.stdout.isatty():
         # Use simpler output for non-terminal environments
-        logger = logging.getLogger('imgbytesizer')
+        logger = logging.getLogger("imgbytesizer")
         logger.info(
             f"Original: {original_dimensions[0]}×{original_dimensions[1]}, "
             f"{format_filesize(original_size)}"
@@ -90,8 +95,11 @@ def print_comparison_table(original_size, original_dimensions,
     target = format_filesize(target_size)
     diff = abs(final_size - target_size)
     diff_pct = (diff / target_size) * 100
-    reduction = ((original_size - final_size) / original_size) * \
-        100 if original_size > final_size else 0
+    reduction = (
+        ((original_size - final_size) / original_size) * 100
+        if original_size > final_size
+        else 0
+    )
 
     # Determine color based on how close to target
     if diff_pct < 1:
@@ -103,22 +111,41 @@ def print_comparison_table(original_size, original_dimensions,
 
     if Colors.supports_color():
         table = [
-            [f"{Colors.BOLD}Dimensions{Colors.ENDC}", f"{Colors.CYAN}{orig_dim}{Colors.ENDC}",
-                f"{Colors.GREEN}{new_dim}{Colors.ENDC}"],
-            [f"{Colors.BOLD}Size{Colors.ENDC}", f"{Colors.CYAN}{orig_size}{Colors.ENDC}",
-                f"{Colors.GREEN}{new_size}{Colors.ENDC}"],
-            [f"{Colors.BOLD}Target Size{Colors.ENDC}", "", f"{Colors.BLUE}{target}{Colors.ENDC}"],
-            [f"{Colors.BOLD}Difference{Colors.ENDC}", "",
-                f"{diff_color}{format_filesize(diff)} ({diff_pct:.1f}%){Colors.ENDC}"],
-            [f"{Colors.BOLD}Reduction{Colors.ENDC}", "",
-                f"{Colors.CYAN}{reduction:.1f}% smaller{Colors.ENDC}"
-                if reduction else f"{Colors.YELLOW}N/A{Colors.ENDC}"]
+            [
+                f"{Colors.BOLD}Dimensions{Colors.ENDC}",
+                f"{Colors.CYAN}{orig_dim}{Colors.ENDC}",
+                f"{Colors.GREEN}{new_dim}{Colors.ENDC}",
+            ],
+            [
+                f"{Colors.BOLD}Size{Colors.ENDC}",
+                f"{Colors.CYAN}{orig_size}{Colors.ENDC}",
+                f"{Colors.GREEN}{new_size}{Colors.ENDC}",
+            ],
+            [
+                f"{Colors.BOLD}Target Size{Colors.ENDC}",
+                "",
+                f"{Colors.BLUE}{target}{Colors.ENDC}",
+            ],
+            [
+                f"{Colors.BOLD}Difference{Colors.ENDC}",
+                "",
+                f"{diff_color}{format_filesize(diff)} ({diff_pct:.1f}%){Colors.ENDC}",
+            ],
+            [
+                f"{Colors.BOLD}Reduction{Colors.ENDC}",
+                "",
+                (
+                    f"{Colors.CYAN}{reduction:.1f}% smaller{Colors.ENDC}"
+                    if reduction
+                    else f"{Colors.YELLOW}N/A{Colors.ENDC}"
+                ),
+            ],
         ]
 
         headers = [
             f"{Colors.UNDERLINE}Metric{Colors.ENDC}",
             f"{Colors.UNDERLINE}Original{Colors.ENDC}",
-            f"{Colors.UNDERLINE}Processed{Colors.ENDC}"
+            f"{Colors.UNDERLINE}Processed{Colors.ENDC}",
         ]
     else:
         table = [
@@ -126,7 +153,7 @@ def print_comparison_table(original_size, original_dimensions,
             ["Size", orig_size, new_size],
             ["Target Size", "", target],
             ["Difference", "", f"{format_filesize(diff)} ({diff_pct:.1f}%)"],
-            ["Reduction", "", f"{reduction:.1f}% smaller" if reduction else "N/A"]
+            ["Reduction", "", f"{reduction:.1f}% smaller" if reduction else "N/A"],
         ]
 
         headers = ["Metric", "Original", "Processed"]

@@ -1,16 +1,17 @@
 """
 Utility functions for imgbytesizer.
 """
+
 import io
 import logging
 from pathlib import Path
 
 
 # Supported image formats
-IMG_FORMATS = ['jpg', 'jpeg', 'png', 'webp']
+IMG_FORMATS = ["jpg", "jpeg", "png", "webp"]
 
 # Logger
-logger = logging.getLogger('imgbytesizer')
+logger = logging.getLogger("imgbytesizer")
 
 
 def parse_filesize(size_str):
@@ -22,13 +23,13 @@ def parse_filesize(size_str):
 
     # Handle decimal points in size strings
     try:
-        if size_str.endswith('KB'):
+        if size_str.endswith("KB"):
             return int(float(size_str[:-2]) * 1024)
-        elif size_str.endswith('MB'):
+        elif size_str.endswith("MB"):
             return int(float(size_str[:-2]) * 1024 * 1024)
-        elif size_str.endswith('GB'):
+        elif size_str.endswith("GB"):
             return int(float(size_str[:-2]) * 1024 * 1024 * 1024)
-        elif size_str.endswith('B'):
+        elif size_str.endswith("B"):
             return int(size_str[:-1])
         else:
             return int(float(size_str))
@@ -39,19 +40,21 @@ def parse_filesize(size_str):
 def get_file_size_bytes(img, format_name, quality=None):
     """Get the file size in bytes for an image with the specified format and quality."""
     out_buffer = io.BytesIO()
-    save_args = {'format': format_name}
+    save_args = {"format": format_name}
 
     # Apply quality settings based on format
     if quality is not None:
-        if format_name in ['JPEG', 'JPG']:
-            save_args['quality'] = quality
-            save_args['optimize'] = True
-        elif format_name == 'PNG':
-            save_args['optimize'] = True
-            save_args['compress_level'] = min(9, quality // 10)  # Map quality to compress_level
-        elif format_name == 'WEBP':
-            save_args['quality'] = quality
-            save_args['method'] = 6  # Higher quality compression method
+        if format_name in ["JPEG", "JPG"]:
+            save_args["quality"] = quality
+            save_args["optimize"] = True
+        elif format_name == "PNG":
+            save_args["optimize"] = True
+            save_args["compress_level"] = min(
+                9, quality // 10
+            )  # Map quality to compress_level
+        elif format_name == "WEBP":
+            save_args["quality"] = quality
+            save_args["method"] = 6  # Higher quality compression method
 
     logger.debug(f"Saving with format {format_name}, params: {save_args}")
 
@@ -73,8 +76,8 @@ def get_output_format(input_format, requested_format=None):
         format_name = input_format
 
     # Normalize format names
-    if format_name == 'JPG':
-        format_name = 'JPEG'
+    if format_name == "JPG":
+        format_name = "JPEG"
 
     return format_name
 
@@ -89,9 +92,9 @@ def get_output_path(image_path, output_path=None, format_name=None):
     # Determine extension
     if format_name:
         ext = format_name.lower()
-        if ext == 'jpeg':
-            ext = 'jpg'
+        if ext == "jpeg":
+            ext = "jpg"
     else:
-        ext = path.suffix[1:] if path.suffix else 'jpg'
+        ext = path.suffix[1:] if path.suffix else "jpg"
 
     return f"{path.stem}_resized.{ext}"
