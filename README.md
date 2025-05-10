@@ -46,7 +46,7 @@ imgbytesizer large_image.jpg 300KB --min-dimension 400
 ### Command-Line Options
 
 ```bash
-usage: imgbytesizer [-h] [-o OUTPUT] [-f FORMAT] [--min-dimension MIN_DIMENSION] [--no-exact] image_path target_size
+usage: imgbytesizer [-h] [-o OUTPUT] [-f {jpg,jpeg,png,webp}] [--min-dimension MIN_DIMENSION] [--no-exact] [-v] [--debug] [-q] [image_path] [target_size]
 
 Resize an image to match a target file size
 
@@ -57,10 +57,14 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   -o, --output OUTPUT   Output path (default: input_resized.ext)
-  -f, --format FORMAT   Output format (jpg, png, webp)
+  -f, --format {jpg,jpeg,png,webp}
+                        Output format
   --min-dimension MIN_DIMENSION
                         Minimum width/height in pixels
   --no-exact            Do not pad file to get exact target size
+  -v, --version         Show version information
+  --debug               Enable debug logging
+  -q, --quiet           Minimal output
 ```
 
 ## How It Works
@@ -77,29 +81,38 @@ The tool prioritizes maintaining the highest possible quality while meeting the 
 ## Example Output
 
 ```
-◐ Opening photo.jpg
-  File: photo.jpg
-  Format: JPEG
-  Dimensions: 4032 × 3024 pixels
-  Size: 2.5 MB
-  Target size: 500 KB
-
+◐ Opening image.png
+  File: image.png
+  Format: WEBP
+  Dimensions: 1920 × 1080 pixels
+  Size: 1.09 MB
+  Target size: 250.00 KB
 Trying quality adjustment without resizing...
-Testing quality 48 |██████████████████████████████| 100% Size: 497.3 KB
+Testing quality 95 |█████████████████████░░░░░░░░░| 70% Size: 145.37 KB
+✓ Found optimal quality: 95 (size: 145.37 KB)
+Adjusting to exact target size...
+Optimizing quality for exact size match...
+Testing quality  96 |██████████████████████████████| 100% 
 
-✓ Found optimal quality: 48 (size: 497.3 KB)
+✓ Quality adjusted to 96: 146.07 KB
+Adding 103.93 KB padding...
+✓ File padded to exact size
 
-┌────────────┬──────────────┬───────────────┐
-│   Metric   │   Original   │   Processed   │
-├────────────┼──────────────┼───────────────┤
-│ Dimensions │  4032×3024   │ 4032×3024     │
-│ Size       │   2.5 MB     │ 497.3 KB      │
-│ Target Size│              │ 500 KB        │
-│ Difference │              │ 2.7 KB (0.5%) │
-│ Reduction  │              │ 80.1% smaller │
-└────────────┴──────────────┴───────────────┘
-  Time taken: 0.87 seconds
-  Output file: photo_resized.jpg
+╭─────────────┬────────────┬───────────────╮
+│ Metric      │ Original   │ Processed     │
+├─────────────┼────────────┼───────────────┤
+│ Dimensions  │ 1920×1080  │ 1920×1080     │
+├─────────────┼────────────┼───────────────┤
+│ Size        │ 1.09 MB    │ 250.00 KB     │
+├─────────────┼────────────┼───────────────┤
+│ Target Size │            │ 250.00 KB     │
+├─────────────┼────────────┼───────────────┤
+│ Difference  │            │ 0 B (0.0%)    │
+├─────────────┼────────────┼───────────────┤
+│ Reduction   │            │ 77.6% smaller │
+╰─────────────┴────────────┴───────────────╯
+  Time taken: 3.77 seconds
+  Output file: image_resized.webp
 ```
 
 ## Real Use Cases
