@@ -423,21 +423,130 @@ def _adjust_to_exact_size(output_path, pil_format, target_size_bytes, quiet=Fals
         if pil_format == "JPEG":
             comment = b"X" * bytes_needed
             temp_buffer = io.BytesIO()
-            final_img.save(
-                temp_buffer,
-                format="JPEG",
-                quality=95,
-                comment=comment.decode("latin1", errors="replace"),
-            )
-            with open(output_path, "wb") as f:
-                f.write(temp_buffer.getvalue())
+
+            # Using a more controlled approach to adding comments
+            try:
+                # Try with a smaller comment first to avoid excessive bloat
+                safe_comment_size = min(
+                    bytes_needed, 65000
+                )  # JPEG comments have size limits
+                comment = b"X" * safe_comment_size
+
+                final_img.save(
+                    temp_buffer,
+                    format="JPEG",
+                    quality=95,
+                    comment=comment.decode("latin1", errors="replace"),
+                )
+
+                # Check if we need multiple passes to reach the target size
+                padded_size = temp_buffer.tell()
+
+                if padded_size > target_size_bytes:
+                    # If we overshot with the comment,
+                    # try binary search to find optimal comment size
+                    low, high = 0, safe_comment_size
+                    while low < high:
+                        mid = (low + high) // 2
+                        comment = b"X" * mid
+                        temp_buffer = io.BytesIO()
+                        final_img.save(
+                            temp_buffer,
+                            format="JPEG",
+                            quality=95,
+                            comment=comment.decode("latin1", errors="replace"),
+                        )
+                        current_size = temp_buffer.tell()
+
+                        if current_size > target_size_bytes:
+                            high = mid
+                        elif current_size < target_size_bytes:
+                            low = mid + 1
+                        else:
+                            break  # Perfect size found
+
+                    # Use the best approximation
+                    comment = b"X" * low
+                    temp_buffer = io.BytesIO()
+                    final_img.save(
+                        temp_buffer,
+                        format="JPEG",
+                        quality=95,
+                        comment=comment.decode("latin1", errors="replace"),
+                    )
+
+                # Write the buffer to the file
+                with open(output_path, "wb") as f:
+                    f.write(temp_buffer.getvalue())
+
+                # If we're still under the target size, pad with zeros
+                final_size = os.path.getsize(output_path)
+                if final_size < target_size_bytes:
+                    with open(output_path, "ab") as f:
+                        remaining_bytes = target_size_bytes - final_size
+                        f.write(b"\0" * remaining_bytes)
+
+            except Exception:
+                # Fallback to simple padding if comment approach fails
+                with open(output_path, "ab") as f:
+                    f.write(b"\0" * bytes_needed)
         else:
+            # For non-JPEG formats, append bytes to the end of the file
             with open(output_path, "ab") as f:
-                f.write(b"P" * bytes_needed)
+                f.write(b"\0" * bytes_needed)
 
         final_size = os.path.getsize(output_path)
-
         if not quiet:
             print(f"{Colors.GREEN}✓ File padded to exact size{Colors.ENDC}")
+
+    elif final_size > target_size_bytes:
+        # Handle the case where the file is too large
+        if not quiet:
+            print(
+                f"Warning: File is {format_filesize(final_size - target_size_bytes)} "
+                f"larger than target size."
+            )
+
+        # For JPEG/WEBP, try to find a better quality setting using binary search
+        if pil_format in ["JPEG", "WEBP"]:
+            low, high = 1, 95  # Start with quality range
+            best_quality = None
+
+            while low <= high:
+                mid = (low + high) // 2
+                temp_buffer = io.BytesIO()
+                final_img.save(temp_buffer, format=pil_format, quality=mid)
+                current_size = temp_buffer.tell()
+
+                if current_size > target_size_bytes:
+                    high = mid - 1
+                else:
+                    best_quality = mid
+                    low = mid + 1
+
+            if best_quality:
+                final_img.save(output_path, format=pil_format, quality=best_quality)
+                final_size = os.path.getsize(output_path)
+
+                # If we're still under target, pad with zeros
+                if final_size < target_size_bytes:
+                    with open(output_path, "ab") as f:
+                        remaining_bytes = target_size_bytes - final_size
+                        f.write(b"\0" * remaining_bytes)
+
+                if not quiet:
+                    print(
+                        f"{Colors.GREEN}✓ Quality adjusted to {best_quality}, size: "
+                        f"{format_filesize(os.path.getsize(output_path))}{Colors.ENDC}"
+                    )
+
+    # Verify final size
+    final_size = os.path.getsize(output_path)
+    if abs(final_size - target_size_bytes) > 50:  # Allow small margin of error
+        if not quiet:
+            print(
+                f"{Colors.YELLOW}Warning: Final size {format_filesize(final_size)} differs from "
+                f"target {format_filesize(target_size_bytes)}{Colors.ENDC}"
+            )
 
     return output_path
