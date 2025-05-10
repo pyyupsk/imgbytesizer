@@ -100,11 +100,13 @@ jobs:
         name: 🔑 Sign artifact
         with:
           inputs: dist/*
-      - name: 🚀 Create Release
-        run: gh release create "$TAG_NAME" --repo "$GITHUB_REPOSITORY"
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      - name: 🚀 Upload Release Asset
-        run: gh release upload "$TAG_NAME" dist/* --repo "$GITHUB_REPOSITORY"
+      - name: 🚀 Create or Update Release
+        run: |
+          if gh release view "$TAG_NAME" --repo "$GITHUB_REPOSITORY"; then
+            gh release upload "$TAG_NAME" dist/* --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG_NAME" --repo "$GITHUB_REPOSITORY"
+            gh release upload "$TAG_NAME" dist/* --repo "$GITHUB_REPOSITORY"
+          fi
         env:
           GITHUB_TOKEN: ${{ github.token }}
