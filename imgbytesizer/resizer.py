@@ -6,6 +6,8 @@ import os
 import io
 import time
 import logging
+from typing import Optional, Tuple, Union
+from pathlib import Path
 from PIL import Image, ImageFile
 
 from .formatter import (
@@ -26,20 +28,20 @@ logger = logging.getLogger("imgbytesizer")
 
 
 def resize_to_target_filesize(
-    image_path,
-    target_size_bytes,
-    output_path=None,
-    format_name=None,
-    min_dimension=None,
-    exact_size=True,
-    quiet=False,
-):
+    image_path: Union[str, Path],
+    target_size_bytes: int,
+    output_path: Optional[str] = None,
+    format_name: Optional[str] = None,
+    min_dimension: Optional[int] = None,
+    exact_size: bool = True,
+    quiet: bool = False,
+) -> str:
     """Resize an image to match a target file size in bytes."""
     start_time = time.time()
 
     # Load the image and get original info
     print_processing_step(
-        0, f"Opening {Colors.YELLOW}{os.path.basename(image_path)}{Colors.ENDC}"
+        0, f"Opening {Colors.YELLOW}{os.path.basename(str(image_path))}{Colors.ENDC}"
     )
 
     try:
@@ -50,15 +52,14 @@ def resize_to_target_filesize(
         raise
 
     orig_width, orig_height = img.size
-    aspect_ratio = orig_width / orig_height
 
     # Normalize format names and determine output path
-    pil_format = get_output_format(img.format, format_name)
+    pil_format = get_output_format(img.format or "JPEG", format_name)
     output_path = get_output_path(image_path, output_path, pil_format)
 
     # Print image information if not in quiet mode
     if not quiet:
-        print_result("File", os.path.basename(image_path))
+        print_result("File", os.path.basename(str(image_path)))
         print_result("Format", pil_format)
         print_result("Dimensions", f"{orig_width} × {orig_height} pixels")
 
@@ -111,7 +112,6 @@ def resize_to_target_filesize(
             orig_width,
             orig_height,
             min_dimension,
-            aspect_ratio,
             quiet,
         )
 
@@ -144,8 +144,12 @@ def resize_to_target_filesize(
 
 
 def _try_quality_adjustment(
-    img, pil_format, target_size_bytes, output_path, quiet=False
-):
+    img: Image.Image,
+    pil_format: str,
+    target_size_bytes: int,
+    output_path: str,
+    quiet: bool = False,
+) -> Optional[str]:
     """Try to reach target size by adjusting quality only."""
     if not quiet:
         print("Trying quality adjustment without resizing...")
@@ -185,7 +189,7 @@ def _try_quality_adjustment(
         if not quiet:
             time.sleep(0.01)
 
-    if best_size is not None:
+    if best_size is not None and best_buffer is not None:
         if not quiet:
             print(
                 f"\n{Colors.GREEN}✓ Found optimal quality: {best_quality} "
@@ -202,16 +206,15 @@ def _try_quality_adjustment(
 
 
 def _try_resizing(
-    img,
-    pil_format,
-    target_size_bytes,
-    output_path,
-    orig_width,
-    orig_height,
-    min_dimension,
-    aspect_ratio,
-    quiet=False,
-):
+    img: Image.Image,
+    pil_format: str,
+    target_size_bytes: int,
+    output_path: str,
+    orig_width: int,
+    orig_height: int,
+    min_dimension: Optional[int],
+    quiet: bool = False,
+) -> str:
     """Try to reach target size by resizing the image."""
     if not quiet:
         print("Performing size-based optimization...")
@@ -246,27 +249,12 @@ def _try_resizing(
             )
 
         # Use LANCZOS for best quality
-        resized_img = img.resize((new_width, new_height), Image.LANCZOS)
+        resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
-        # For quality-supporting formats, do a nested binary search for quality
-        if pil_format in ["JPEG", "WEBP"]:
-            quality_result = _find_best_quality(
-                resized_img, pil_format, target_size_bytes, quiet
-            )
-
-            if quality_result:
-                size, buffer = quality_result
-            else:
-                size, buffer = get_file_size_bytes(resized_img, pil_format, 1)
-        else:
-            size, buffer = get_file_size_bytes(resized_img, pil_format)
-
-        if not quiet:
-            result_status = "✓" if size <= target_size_bytes else "✗"
-            result_color = Colors.GREEN if size <= target_size_bytes else Colors.RED
-            print(
-                f"  {result_color}{result_status} Result: {format_filesize(size)}{Colors.ENDC}"
-            )
+        # Try to find best quality for this size
+        size, buffer = _find_best_quality(
+            resized_img, pil_format, target_size_bytes, quiet
+        )
 
         if size <= target_size_bytes and (best_size is None or size > best_size):
             best_size = size
@@ -277,276 +265,91 @@ def _try_resizing(
         else:
             low_scale = mid_scale
 
-    # If no suitable size was found, create smallest possible image
-    if best_buffer is None:
-        if not quiet:
-            print(
-                f"\n{Colors.YELLOW}⚠ Could not find optimal size. "
-                f"Creating smallest possible image...{Colors.ENDC}"
-            )
-
-        if min_dimension:
-            if orig_width > orig_height:
-                new_width = int(min_dimension * aspect_ratio)
-                new_height = min_dimension
-            else:
-                new_width = min_dimension
-                new_height = int(min_dimension / aspect_ratio)
-        else:
-            new_width = max(1, int(orig_width * 0.01))
-            new_height = max(1, int(orig_height * 0.01))
-
-        resized_img = img.resize((new_width, new_height), Image.LANCZOS)
-        quality = 1 if pil_format in ["JPEG", "WEBP"] else None
-        best_size, best_buffer = get_file_size_bytes(resized_img, pil_format, quality)
-
-        if not quiet:
-            print(
-                f"  Created {new_width}×{new_height} image with size {format_filesize(best_size)}"
-            )
-
-    # Save the best result
-    with open(output_path, "wb") as f:
-        f.write(best_buffer.getvalue())
-
-    return output_path
-
-
-def _find_best_quality(img, pil_format, target_size_bytes, quiet=False):
-    """Find the best quality for the given image to match the target size."""
-    quality_low, quality_high = 1, 95
-    best_q = None
-    best_q_size = None
-    best_q_buffer = None
-    q_iterations = 0
-
-    if not quiet:
-        print(f"  {Colors.CYAN}Finding optimal quality...{Colors.ENDC}")
-
-    while quality_low <= quality_high and q_iterations < 8:  # Limit search
-        q_iterations += 1
-        q_mid = (quality_low + quality_high) // 2
-        q_size, q_buffer = get_file_size_bytes(img, pil_format, q_mid)
-
-        if not quiet:
-            result_indicator = " "
-            if q_size <= target_size_bytes:
-                result_indicator = f"{Colors.GREEN}✓{Colors.ENDC}"
-            else:
-                result_indicator = f"{Colors.RED}✗{Colors.ENDC}"
-
-            print(
-                f"    {result_indicator} Quality {q_mid:2d}: {format_filesize(q_size)}"
-            )
-
-        if q_size <= target_size_bytes:
-            if best_q_size is None or q_size > best_q_size:
-                best_q = q_mid
-                best_q_size = q_size
-                best_q_buffer = q_buffer
-            quality_low = q_mid + 1
-        else:
-            quality_high = q_mid - 1
-
-        # Small delay for visual effect
+        # Add small delay for visual effect in progress bar if not in quiet mode
         if not quiet:
             time.sleep(0.01)
 
-    if best_q_size is not None:
+    if best_buffer is None:
+        raise ValueError("Could not find suitable size and quality combination")
+
+    # Write the best result to file
+    with open(output_path, "wb") as f:
+        f.write(best_buffer.getvalue())
+
+    if not quiet:
+        if best_size is not None:
+            found_size = format_filesize(best_size)
+        else:
+            found_size = "Unknown"
+
+        print(f"\n{Colors.GREEN}✓ Found optimal size: {found_size}{Colors.ENDC}")
+
+    return output_path
+
+
+def _find_best_quality(
+    img: Image.Image, pil_format: str, target_size_bytes: int, quiet: bool = False
+) -> Tuple[int, io.BytesIO]:
+    """Find the best quality setting for a given image size."""
+    low, high = 1, 95
+    best_size = None
+    best_buffer = None
+    iteration = 0
+    max_iterations = 10  # Limit iterations for binary search
+
+    while low <= high and iteration < max_iterations:
+        iteration += 1
+        mid = (low + high) // 2
+        size, buffer = get_file_size_bytes(img, pil_format, mid)
+
         if not quiet:
-            print(f"    {Colors.GREEN}→ Best quality: {best_q}{Colors.ENDC}")
-        return best_q_size, best_q_buffer
-    else:
+            print_progress_bar(
+                iteration,
+                max_iterations,
+                prefix=f"Testing quality {mid:2d}",
+                suffix=f"Size: {format_filesize(size)}",
+            )
+
+        if size <= target_size_bytes and (best_size is None or size > best_size):
+            best_size = size
+            best_buffer = buffer
+
+        if size > target_size_bytes:
+            high = mid - 1
+        else:
+            low = mid + 1
+
+        # Add small delay for visual effect in progress bar if not in quiet mode
         if not quiet:
-            print(f"    {Colors.YELLOW}→ Using minimum quality: 1{Colors.ENDC}")
-        return None
+            time.sleep(0.01)
+
+    if best_buffer is None or best_size is None:
+        raise ValueError("Could not find suitable quality setting")
+
+    return best_size, best_buffer
 
 
-def _adjust_to_exact_size(output_path, pil_format, target_size_bytes, quiet=False):
-    """Adjust file to exactly match the target size."""
-    final_img = Image.open(output_path)
-    final_size = os.path.getsize(output_path)
-
+def _adjust_to_exact_size(
+    output_path: str, pil_format: str, target_size_bytes: int, quiet: bool = False
+) -> None:
+    """Adjust the image to match the exact target size by adding padding if needed."""
     if not quiet:
         print("Adjusting to exact target size...")
 
-    # For JPEG/WEBP, try to find a better quality setting first
-    if pil_format in ["JPEG", "WEBP"] and abs(final_size - target_size_bytes) > 100:
-        if not quiet:
-            print("Optimizing quality for exact size match...")
+    # Read the current image
+    current_size = os.path.getsize(output_path)
 
-        best_quality = None
-        best_size_diff = abs(final_size - target_size_bytes)
+    # Calculate padding needed
+    padding_needed = target_size_bytes - current_size
+    if padding_needed <= 0:
+        return
 
-        # Test fewer qualities for speed
-        quality_range = range(1, 101, 5)
+    # Add padding by appending to the file
+    with open(output_path, "ab") as f:
+        f.write(b"\0" * padding_needed)
 
-        for i, quality in enumerate(quality_range):
-            if not quiet:
-                print_progress_bar(
-                    i + 1,
-                    len(quality_range),
-                    prefix=f"Testing quality {quality:3d}",
-                    suffix="",
-                )
-
-            test_buffer = io.BytesIO()
-            final_img.save(test_buffer, format=pil_format, quality=quality)
-            test_size = test_buffer.tell()
-            size_diff = abs(test_size - target_size_bytes)
-
-            if size_diff < best_size_diff:
-                best_quality = quality
-                best_size_diff = size_diff
-
-            if not quiet:
-                time.sleep(0.01)  # Visual delay
-
-        if best_quality is not None:
-            final_img.save(output_path, format=pil_format, quality=best_quality)
-            final_size = os.path.getsize(output_path)
-
-            if not quiet:
-                print(
-                    f"\n{Colors.GREEN}✓ Quality adjusted to {best_quality}: "
-                    f"{format_filesize(final_size)}{Colors.ENDC}"
-                )
-
-    # If we still need to pad the file
-    if final_size < target_size_bytes:
-        bytes_needed = target_size_bytes - final_size
-
-        if not quiet:
-            print(f"Adding {format_filesize(bytes_needed)} padding...")
-
-        # Different padding strategies based on format
-        if pil_format == "JPEG":
-            comment = b"X" * bytes_needed
-            temp_buffer = io.BytesIO()
-
-            # Using a more controlled approach to adding comments
-            try:
-                # Try with a smaller comment first to avoid excessive bloat
-                safe_comment_size = min(
-                    bytes_needed, 65000
-                )  # JPEG comments have size limits
-                comment = b"X" * safe_comment_size
-
-                final_img.save(
-                    temp_buffer,
-                    format="JPEG",
-                    quality=95,
-                    comment=comment.decode("latin1", errors="replace"),
-                )
-
-                # Check if we need multiple passes to reach the target size
-                padded_size = temp_buffer.tell()
-
-                if padded_size > target_size_bytes:
-                    # If we overshot with the comment,
-                    # try binary search to find optimal comment size
-                    low, high = 0, safe_comment_size
-                    while low < high:
-                        mid = (low + high) // 2
-                        comment = b"X" * mid
-                        temp_buffer = io.BytesIO()
-                        final_img.save(
-                            temp_buffer,
-                            format="JPEG",
-                            quality=95,
-                            comment=comment.decode("latin1", errors="replace"),
-                        )
-                        current_size = temp_buffer.tell()
-
-                        if current_size > target_size_bytes:
-                            high = mid
-                        elif current_size < target_size_bytes:
-                            low = mid + 1
-                        else:
-                            break  # Perfect size found
-
-                    # Use the best approximation
-                    comment = b"X" * low
-                    temp_buffer = io.BytesIO()
-                    final_img.save(
-                        temp_buffer,
-                        format="JPEG",
-                        quality=95,
-                        comment=comment.decode("latin1", errors="replace"),
-                    )
-
-                # Write the buffer to the file
-                with open(output_path, "wb") as f:
-                    f.write(temp_buffer.getvalue())
-
-                # If we're still under the target size, pad with zeros
-                final_size = os.path.getsize(output_path)
-                if final_size < target_size_bytes:
-                    with open(output_path, "ab") as f:
-                        remaining_bytes = target_size_bytes - final_size
-                        f.write(b"\0" * remaining_bytes)
-
-            except Exception:
-                # Fallback to simple padding if comment approach fails
-                with open(output_path, "ab") as f:
-                    f.write(b"\0" * bytes_needed)
-        else:
-            # For non-JPEG formats, append bytes to the end of the file
-            with open(output_path, "ab") as f:
-                f.write(b"\0" * bytes_needed)
-
-        final_size = os.path.getsize(output_path)
-        if not quiet:
-            print(f"{Colors.GREEN}✓ File padded to exact size{Colors.ENDC}")
-
-    elif final_size > target_size_bytes:
-        # Handle the case where the file is too large
-        if not quiet:
-            print(
-                f"Warning: File is {format_filesize(final_size - target_size_bytes)} "
-                f"larger than target size."
-            )
-
-        # For JPEG/WEBP, try to find a better quality setting using binary search
-        if pil_format in ["JPEG", "WEBP"]:
-            low, high = 1, 95  # Start with quality range
-            best_quality = None
-
-            while low <= high:
-                mid = (low + high) // 2
-                temp_buffer = io.BytesIO()
-                final_img.save(temp_buffer, format=pil_format, quality=mid)
-                current_size = temp_buffer.tell()
-
-                if current_size > target_size_bytes:
-                    high = mid - 1
-                else:
-                    best_quality = mid
-                    low = mid + 1
-
-            if best_quality:
-                final_img.save(output_path, format=pil_format, quality=best_quality)
-                final_size = os.path.getsize(output_path)
-
-                # If we're still under target, pad with zeros
-                if final_size < target_size_bytes:
-                    with open(output_path, "ab") as f:
-                        remaining_bytes = target_size_bytes - final_size
-                        f.write(b"\0" * remaining_bytes)
-
-                if not quiet:
-                    print(
-                        f"{Colors.GREEN}✓ Quality adjusted to {best_quality}, size: "
-                        f"{format_filesize(os.path.getsize(output_path))}{Colors.ENDC}"
-                    )
-
-    # Verify final size
-    final_size = os.path.getsize(output_path)
-    if abs(final_size - target_size_bytes) > 50:  # Allow small margin of error
-        if not quiet:
-            print(
-                f"{Colors.YELLOW}Warning: Final size {format_filesize(final_size)} differs from "
-                f"target {format_filesize(target_size_bytes)}{Colors.ENDC}"
-            )
-
-    return output_path
+    if not quiet:
+        print(
+            f"{Colors.GREEN}✓ Adjusted to exact size: "
+            f"{format_filesize(target_size_bytes)}{Colors.ENDC}"
+        )

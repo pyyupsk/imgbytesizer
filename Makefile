@@ -8,18 +8,19 @@ build:
 test:
 	pytest
 
-# Run linters
+# Run linters (Ruff for fast linting + Vulture for dead code)
 lint:
-	flake8 imgbytesizer tests
-	vulture imgbytesizer tests .vulture_ignore.py
+	ruff check .
+	vulture imgbytesizer scripts tests .vulture_ignore.py
 
 # Run static type checks
 typecheck:
-	mypy imgbytesizer tests
+	mypy .
 
-# Auto-format code
+# Auto-format code (Black for formatting + Ruff for autofixable linting)
 format:
-	black imgbytesizer tests
+	ruff check . --fix
+	black .
 
 # Clean build artifacts
 clean:

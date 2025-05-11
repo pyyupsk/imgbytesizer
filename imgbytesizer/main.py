@@ -12,7 +12,7 @@ from .resizer import resize_to_target_filesize
 from .utils import parse_filesize, IMG_FORMATS
 
 
-def main():
+def main() -> int:
     """Main entry point for the CLI."""
     # Setup logger
     logger = setup_logger()

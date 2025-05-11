@@ -4,22 +4,25 @@ Terminal formatting utilities for imgbytesizer.
 
 import sys
 import logging
+from typing import Tuple, Optional
 from tabulate import tabulate
 
 from .logger import Colors
 
 
-def format_filesize(size_bytes, precision=2):
+def format_filesize(size_bytes: int, precision: int = 2) -> str:
     """Format file size in a human-readable format."""
     if size_bytes < 1024:
         return f"{size_bytes} B"
     elif size_bytes < 1024 * 1024:
-        return f"{size_bytes/1024:.{precision}f} KB"
+        return f"{size_bytes / 1024:.{precision}f} KB"
     else:
-        return f"{size_bytes/(1024*1024):.{precision}f} MB"
+        return f"{size_bytes / (1024 * 1024):.{precision}f} MB"
 
 
-def print_progress_bar(progress, total, prefix="", suffix="", length=30):
+def print_progress_bar(
+    progress: int, total: int, prefix: str = "", suffix: str = "", length: int = 30
+) -> None:
     """Print a progress bar with percentage."""
     if not sys.stdout.isatty():
         return  # Don't print progress bars if not in a terminal
@@ -40,7 +43,7 @@ def print_progress_bar(progress, total, prefix="", suffix="", length=30):
         print()
 
 
-def print_result(name, value, status=None):
+def print_result(name: str, value: str, status: Optional[str] = None) -> None:
     """Print a name-value pair with optional status color."""
     value_color = Colors.ENDC
     if status == "good":
@@ -56,7 +59,7 @@ def print_result(name, value, status=None):
         print(f"  {name}: {value}")
 
 
-def print_processing_step(step, description):
+def print_processing_step(step: int, description: str) -> None:
     """Print a processing step with a spinner."""
     if not sys.stdout.isatty():
         logger = logging.getLogger("imgbytesizer")
@@ -72,8 +75,12 @@ def print_processing_step(step, description):
 
 
 def print_comparison_table(
-    original_size, original_dimensions, final_size, final_dimensions, target_size
-):
+    original_size: int,
+    original_dimensions: Tuple[int, int],
+    final_size: int,
+    final_dimensions: Tuple[int, int],
+    target_size: int,
+) -> None:
     """Print comparison table between original and processed image."""
     if not sys.stdout.isatty():
         # Use simpler output for non-terminal environments

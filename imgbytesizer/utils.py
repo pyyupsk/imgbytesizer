@@ -5,16 +5,18 @@ Utility functions for imgbytesizer.
 import io
 import logging
 from pathlib import Path
+from typing import Tuple, Optional, Union, List, Dict, Any
+from PIL import Image
 
 
 # Supported image formats
-IMG_FORMATS = ["jpg", "jpeg", "png", "webp"]
+IMG_FORMATS: List[str] = ["jpg", "jpeg", "png", "webp"]
 
 # Logger
 logger = logging.getLogger("imgbytesizer")
 
 
-def parse_filesize(size_str):
+def parse_filesize(size_str: str) -> int:
     """Parse a file size string like '1MB' to bytes."""
     if not size_str:
         raise ValueError("File size cannot be empty")
@@ -37,10 +39,12 @@ def parse_filesize(size_str):
         raise ValueError("Invalid file size format. Use B, KB, MB, or GB suffix.")
 
 
-def get_file_size_bytes(img, format_name, quality=None):
+def get_file_size_bytes(
+    img: Image.Image, format_name: str, quality: Optional[int] = None
+) -> Tuple[int, io.BytesIO]:
     """Get the file size in bytes for an image with the specified format and quality."""
     out_buffer = io.BytesIO()
-    save_args = {"format": format_name}
+    save_args: Dict[str, Any] = {"format": format_name}
 
     # Apply quality settings based on format
     if quality is not None:
@@ -68,7 +72,7 @@ def get_file_size_bytes(img, format_name, quality=None):
         raise
 
 
-def get_output_format(input_format, requested_format=None):
+def get_output_format(input_format: str, requested_format: Optional[str] = None) -> str:
     """Determine the output format based on input and requested format."""
     if requested_format:
         format_name = requested_format.upper()
@@ -82,7 +86,11 @@ def get_output_format(input_format, requested_format=None):
     return format_name
 
 
-def get_output_path(image_path, output_path=None, format_name=None):
+def get_output_path(
+    image_path: Union[str, Path],
+    output_path: Optional[str] = None,
+    format_name: Optional[str] = None,
+) -> str:
     """Generate appropriate output path."""
     path = Path(image_path)
 
