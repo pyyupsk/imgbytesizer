@@ -81,37 +81,45 @@ The tool prioritizes maintaining the highest possible quality while meeting the 
 ## Example Output
 
 ```
+❯ imgbytesizer image.png 1MB -f webp
+
 ◐ Opening image.png
   File: image.png
   Format: WEBP
-  Dimensions: 1920 × 1080 pixels
-  Size: 1.09 MB
-  Target size: 250.00 KB
+  Dimensions: 1024 × 1024 pixels
+  Size: 1.95 MB
+  Target size: 1.00 MB
 Trying quality adjustment without resizing...
-Testing quality 95 |█████████████████████░░░░░░░░░| 70% Size: 145.37 KB
-✓ Found optimal quality: 95 (size: 145.37 KB)
-Adjusting to exact target size...
-Optimizing quality for exact size match...
-Testing quality  96 |██████████████████████████████| 100%
+Testing quality 100 |█████████████████░░░░░░░░░░░░░| 58% Size: 476.46 KB
+✓ Found optimal quality: 100 (size: 476.46 KB)
+Trying combined scaling and quality approach...
+Trying scale factor 1.00 (1024×1024)...
+Quality 100 |██████████████████████████████| 100% Size: 476.46 KB
+Trying scale factor 1.25 (1280×1280)...
+Quality 100 |██████████████████████████████| 100% Size: 680.51 KB
+Trying scale factor 1.50 (1536×1536)...
+Quality 100 |██████████████████████████████| 100% Size: 903.38 KB
+Trying scale factor 2.00 (2048×2048)...
+Quality 96 |██████████████████████████████| 100% Size: 1011.68 KB
 
-✓ Quality adjusted to 96: 146.07 KB
-Adding 103.93 KB padding...
-✓ File padded to exact size
+✓ Combined approach success: scale=2.00, size=1011.68 KB
+Adjusting to exact target size...
+✓ Adjusted to exact size: 1.00 MB
 
 ╭─────────────┬────────────┬───────────────╮
 │ Metric      │ Original   │ Processed     │
 ├─────────────┼────────────┼───────────────┤
-│ Dimensions  │ 1920×1080  │ 1920×1080     │
+│ Dimensions  │ 1024×1024  │ 2048×2048     │
 ├─────────────┼────────────┼───────────────┤
-│ Size        │ 1.09 MB    │ 250.00 KB     │
+│ Size        │ 1.95 MB    │ 1.00 MB       │
 ├─────────────┼────────────┼───────────────┤
-│ Target Size │            │ 250.00 KB     │
+│ Target Size │            │ 1.00 MB       │
 ├─────────────┼────────────┼───────────────┤
 │ Difference  │            │ 0 B (0.0%)    │
 ├─────────────┼────────────┼───────────────┤
-│ Reduction   │            │ 77.6% smaller │
+│ Reduction   │            │ 48.8% smaller │
 ╰─────────────┴────────────┴───────────────╯
-  Time taken: 3.77 seconds
+  Time taken: 28.12 seconds
   Output file: image_resized.webp
 ```
 
