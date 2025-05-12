@@ -1,5 +1,5 @@
-import tomli
 import requests
+import tomli
 
 # Read local version from pyproject.toml
 with open("pyproject.toml", "rb") as f:

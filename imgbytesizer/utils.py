@@ -5,9 +5,9 @@ Utility functions for imgbytesizer.
 import io
 import logging
 from pathlib import Path
-from typing import Tuple, Optional, Union, List, Dict, Any
-from PIL import Image
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+from PIL import Image
 
 # Supported image formats
 IMG_FORMATS: List[str] = ["jpg", "jpeg", "png", "webp"]

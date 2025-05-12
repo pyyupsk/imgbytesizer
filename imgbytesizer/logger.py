@@ -1,6 +1,6 @@
-import sys
 import logging
-from typing import Dict, ClassVar
+import sys
+from typing import ClassVar, Dict
 
 
 # ANSI Color Codes for beautiful terminal output

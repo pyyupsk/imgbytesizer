@@ -1,11 +1,8 @@
 import pytest
-from imgbytesizer.utils import (
-    parse_filesize,
-    get_file_size_bytes,
-    get_output_format,
-    get_output_path,
-    IMG_FORMATS,
-)
+
+from imgbytesizer.utils import (IMG_FORMATS, get_file_size_bytes,
+                                get_output_format, get_output_path,
+                                parse_filesize)
 
 
 def test_parse_filesize():
@@ -52,8 +49,9 @@ def test_get_output_path():
 
 
 def test_get_file_size_bytes():
-    from PIL import Image
     import io
+
+    from PIL import Image
 
     # Create test image
     img = Image.new("RGB", (100, 100), color="red")

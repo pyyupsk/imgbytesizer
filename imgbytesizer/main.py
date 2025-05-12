@@ -2,14 +2,14 @@
 Command-line interface for imgbytesizer.
 """
 
-import sys
 import argparse
 import logging
+import sys
 from pathlib import Path
 
 from .logger import setup_logger
 from .resizer import resize_to_target_filesize
-from .utils import parse_filesize, IMG_FORMATS
+from .utils import IMG_FORMATS, parse_filesize
 
 
 def main() -> int:

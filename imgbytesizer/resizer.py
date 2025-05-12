@@ -2,21 +2,18 @@
 Core image resizing functionality.
 """
 
-import os
 import io
-import time
 import logging
-from typing import Optional, Tuple, Union
+import os
+import time
 from pathlib import Path
+from typing import Optional, Tuple, Union
+
 from PIL import Image, ImageFile
 
-from .formatter import (
-    print_progress_bar,
-    print_result,
-    print_processing_step,
-    print_comparison_table,
-    format_filesize,
-)
+from .formatter import (format_filesize, print_comparison_table,
+                        print_processing_step, print_progress_bar,
+                        print_result)
 from .logger import Colors
 from .utils import get_file_size_bytes, get_output_format, get_output_path
 

@@ -2,9 +2,10 @@
 Terminal formatting utilities for imgbytesizer.
 """
 
-import sys
 import logging
-from typing import Tuple, Optional
+import sys
+from typing import Optional, Tuple
+
 from tabulate import tabulate
 
 from .logger import Colors

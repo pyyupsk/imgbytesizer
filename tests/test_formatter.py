@@ -1,9 +1,7 @@
 import sys
 from io import StringIO
-from imgbytesizer.formatter import (
-    format_filesize,
-    print_result,
-)
+
+from imgbytesizer.formatter import format_filesize, print_result
 
 
 def test_format_filesize():
