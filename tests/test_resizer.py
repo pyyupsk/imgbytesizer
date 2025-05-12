@@ -1,5 +1,4 @@
 import os
-
 import pytest
 from PIL import Image
 
@@ -9,6 +8,8 @@ from imgbytesizer.resizer import (
     _try_quality_adjustment,
     _try_resizing,
     resize_to_target_filesize,
+    _try_combined_approach,
+    _final_quality_adjustment,
 )
 
 
@@ -216,4 +217,85 @@ def test_large_target_size(sample_image):
 
     assert os.path.exists(output_path)
     assert os.path.getsize(output_path) == original_size  # Should not increase size
+    os.remove(output_path)
+
+
+def test_try_combined_approach(sample_image):
+    # Test combined scaling and quality approach
+    img = Image.open(sample_image)
+    target_size = 100 * 1024  # 100KB
+    result = _try_combined_approach(
+        img,
+        "JPEG",
+        target_size,
+        "test_output.jpg",
+        800,  # original width
+        600,  # original height
+        None,  # no min dimension
+        quiet=True,
+    )
+
+    assert result is not None
+    assert os.path.exists(result)
+    assert os.path.getsize(result) <= target_size
+    os.remove(result)
+
+
+def test_final_quality_adjustment(sample_image):
+    # Test final quality adjustment when overshooting
+    img = Image.open(sample_image)
+    target_size = 50 * 1024  # 50KB
+    output_path = "test_output.jpg"
+    img.save(
+        output_path, "JPEG", quality=95
+    )  # Save with high quality to ensure overshooting
+
+    _final_quality_adjustment(output_path, "JPEG", target_size, quiet=True)
+
+    assert os.path.exists(output_path)
+    assert os.path.getsize(output_path) <= target_size
+    os.remove(output_path)
+
+
+def test_resize_to_target_filesize_error_handling():
+    # Test various error conditions
+    with pytest.raises(Exception):
+        # Test with invalid image path
+        resize_to_target_filesize("nonexistent.jpg", 50 * 1024, quiet=True)
+
+    with pytest.raises(Exception):
+        # Test with invalid format
+        resize_to_target_filesize(
+            "test.jpg", 50 * 1024, format_name="INVALID", quiet=True
+        )
+
+    with pytest.raises(Exception):
+        # Test with negative target size
+        resize_to_target_filesize("test.jpg", -1, quiet=True)
+
+
+def test_format_conversion_edge_cases(sample_image):
+    # Test format conversion edge cases
+    target_size = 50 * 1024  # 50KB
+
+    # Test JPEG to PNG conversion
+    output_path = resize_to_target_filesize(
+        sample_image,
+        target_size,
+        output_path="test_output.png",
+        format_name="PNG",
+        quiet=True,
+    )
+    assert output_path.endswith(".png")
+    os.remove(output_path)
+
+    # Test JPEG to WEBP conversion
+    output_path = resize_to_target_filesize(
+        sample_image,
+        target_size,
+        output_path="test_output.webp",
+        format_name="WEBP",
+        quiet=True,
+    )
+    assert output_path.endswith(".webp")
     os.remove(output_path)
