@@ -46,7 +46,7 @@ def test_resize_to_target_filesize_basic(sample_image):
     )
 
     assert os.path.exists(output_path)
-    assert abs(os.path.getsize(output_path) - target_size) <= 100  # Allow small margin
+    assert os.path.getsize(output_path) <= target_size
     os.remove(output_path)
 
 
