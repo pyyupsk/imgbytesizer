@@ -34,7 +34,7 @@ imgbytesizer image.jpg 500KB
 imgbytesizer large_photo.jpg 500KB
 
 # Resize and convert to WebP format
-imgbytesizer image.png 250KB -f webp
+imgbytesizer image.png 1MB -f webp
 
 # Specify output file path
 imgbytesizer photo.jpg 1MB -o compressed_photo.jpg

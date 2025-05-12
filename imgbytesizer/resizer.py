@@ -117,7 +117,7 @@ def resize_to_target_filesize(
 
     # Fine-tuning to match exact target size if needed
     if exact_size and os.path.getsize(output_path) < target_size_bytes:
-        _adjust_to_exact_size(output_path, pil_format, target_size_bytes, quiet)
+        _adjust_to_exact_size(output_path, target_size_bytes, quiet)
 
     # Final report if not in quiet mode
     if not quiet:
@@ -330,9 +330,9 @@ def _find_best_quality(
 
 
 def _adjust_to_exact_size(
-    output_path: str, pil_format: str, target_size_bytes: int, quiet: bool = False
+    output_path: str, target_size_bytes: int, quiet: bool = False
 ) -> None:
-    """Adjust the image to match the exact target size by adding padding if needed."""
+    """Adjust the image to match the exact target size by adding padding bytes to the file."""
     if not quiet:
         print("Adjusting to exact target size...")
 
@@ -340,13 +340,13 @@ def _adjust_to_exact_size(
     current_size = os.path.getsize(output_path)
 
     # Calculate padding needed
-    padding_needed = target_size_bytes - current_size
+    padding_needed = max(0, target_size_bytes - current_size)
     if padding_needed <= 0:
         return
 
     # Add padding by appending to the file
     with open(output_path, "ab") as f:
-        f.write(b"\0" * padding_needed)
+        f.write(b"\x00" * padding_needed)
 
     if not quiet:
         print(

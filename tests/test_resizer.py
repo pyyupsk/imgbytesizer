@@ -128,7 +128,6 @@ def test_try_resizing(sample_image):
         800,  # original width
         600,  # original height
         None,  # no min dimension
-        800 / 600,  # aspect ratio
         quiet=True,
     )
 
@@ -156,7 +155,7 @@ def test_adjust_to_exact_size(sample_image):
     output_path = "test_output.jpg"
     img.save(output_path, "JPEG", quality=95)
 
-    _adjust_to_exact_size(output_path, "JPEG", target_size, quiet=True)
+    _adjust_to_exact_size(output_path, target_size, quiet=True)
 
     assert os.path.exists(output_path)
     assert abs(os.path.getsize(output_path) - target_size) <= 100
