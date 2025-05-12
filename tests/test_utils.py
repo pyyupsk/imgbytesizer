@@ -1,8 +1,12 @@
 import pytest
 
-from imgbytesizer.utils import (IMG_FORMATS, get_file_size_bytes,
-                                get_output_format, get_output_path,
-                                parse_filesize)
+from imgbytesizer.utils import (
+    IMG_FORMATS,
+    get_file_size_bytes,
+    get_output_format,
+    get_output_path,
+    parse_filesize,
+)
 
 
 def test_parse_filesize():

@@ -16,10 +16,9 @@ lint:
 typecheck:
 	mypy .
 
-# Auto-format code (Black for formatting + Isort for imports)
+# Auto-format code (Black for formatting)
 format:
 	black .
-	isort .
 
 # Clean build artifacts
 clean:
