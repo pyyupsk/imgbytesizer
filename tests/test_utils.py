@@ -1,4 +1,7 @@
+import io
+
 import pytest
+from PIL import Image
 
 from imgbytesizer.utils import (
     IMG_FORMATS,
@@ -53,10 +56,6 @@ def test_get_output_path():
 
 
 def test_get_file_size_bytes():
-    import io
-
-    from PIL import Image
-
     # Create test image
     img = Image.new("RGB", (100, 100), color="red")
 
@@ -77,8 +76,6 @@ def test_get_file_size_bytes():
 
 
 def test_get_file_size_bytes_invalid():
-    from PIL import Image
-
     # Create test image
     img = Image.new("RGB", (100, 100), color="red")
 
@@ -94,3 +91,13 @@ def test_img_formats():
     assert "png" in IMG_FORMATS
     assert "webp" in IMG_FORMATS
     assert len(IMG_FORMATS) == 4
+
+
+def test_get_file_size_bytes_png_with_quality():
+    img = Image.new("RGB", (50, 50), color="blue")
+    size, buffer = get_file_size_bytes(img, "PNG", quality=80)
+    assert size > 0
+
+
+def test_get_output_path_with_jpeg_extension():
+    assert get_output_path("image.jpg", format_name="jpeg") == "image_resized.jpg"

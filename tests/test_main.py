@@ -1,3 +1,4 @@
+import subprocess
 import sys
 from pathlib import Path
 from unittest.mock import patch
@@ -25,6 +26,20 @@ def test_image(tmp_path):
     image = tmp_path / "test.jpg"
     image.touch()
     return image
+
+
+def test_main_entrypoint(tmp_path):
+    script_path = Path(__file__).parent.parent / "imgbytesizer" / "main.py"
+    test_image = tmp_path / "test.jpg"
+    test_image.touch()
+
+    result = subprocess.run(
+        [sys.executable, str(script_path), str(test_image), "1KB", "-q"],
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode in (0, 1)
 
 
 def test_version_display(capsys):

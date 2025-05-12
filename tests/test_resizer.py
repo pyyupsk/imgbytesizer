@@ -1,15 +1,16 @@
 import os
+
 import pytest
 from PIL import Image
 
 from imgbytesizer.resizer import (
     _adjust_to_exact_size,
+    _final_quality_adjustment,
     _find_best_quality,
+    _try_combined_approach,
     _try_quality_adjustment,
     _try_resizing,
     resize_to_target_filesize,
-    _try_combined_approach,
-    _final_quality_adjustment,
 )
 
 
