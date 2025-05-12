@@ -34,8 +34,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+          make build
       - name: 🧪 Run tests
-        run: pytest
+        run: make test
 
   check-version:
     runs-on: ubuntu-latest
@@ -73,7 +74,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
       - name: 🏗 Build release
-        run: python -m build
+        run: make build
       - uses: actions/upload-artifact@v4
         name: 📤 Upload artifact
         with:
