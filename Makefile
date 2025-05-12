@@ -6,8 +6,7 @@ build:
 
 # Run tests
 test:
-	pip install -e .
-	pytest
+	pytest tests/ --cov=imgbytesizer --cov-report=xml
 
 # Run linters (Vulture for dead code)
 lint:
