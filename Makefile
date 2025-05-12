@@ -19,8 +19,8 @@ typecheck:
 
 # Auto-format code (Black for formatting + Isort for imports)
 format:
-	isort .
 	black .
+	isort .
 
 # Clean build artifacts
 clean:

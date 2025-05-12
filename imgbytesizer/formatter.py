@@ -11,7 +11,7 @@ from tabulate import tabulate
 from .logger import Colors
 
 
-def format_filesize(size_bytes: int | None, precision: int = 2) -> str:
+def format_filesize(size_bytes: Optional[int], precision: int = 2) -> str:
     """Format file size in a human-readable format."""
     if size_bytes is None:
         return "N/A"
