@@ -1,0 +1,11 @@
+{
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "[python]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.formatOnSaveMode": "file",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "eeyore.yapf"
+  }
+}

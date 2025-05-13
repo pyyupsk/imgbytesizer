@@ -1,0 +1,12 @@
+[style]
+based_on_style = pep8
+indent_width = 2
+column_limit = 100
+split_before_named_assigns = true
+split_before_expression_after_opening_paren = true
+allow_multiline_lambdas = true
+dedent_closing_brackets = true
+coalesce_brackets = false
+split_complex_comprehension = true
+each_dict_entry_on_separate_line = true
+split_before_first_argument = true

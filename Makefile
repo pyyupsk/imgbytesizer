@@ -16,9 +16,9 @@ lint:
 typecheck:
 	mypy .
 
-# Auto-format code (Black for formatting)
+# Auto-format code (YAPF for formatting)
 format:
-	black .
+	yapf -ir imgbytesizer scripts tests
 
 # Clean build artifacts
 clean:
