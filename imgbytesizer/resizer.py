@@ -11,14 +11,14 @@ from typing import Optional, Tuple, Union
 
 from PIL import Image, ImageFile
 
-from .formatter import (
-    format_filesize,
+from .formatter import format_filesize
+from .logger import (
+    Colors,
     print_comparison_table,
     print_processing_step,
     print_progress_bar,
     print_result,
 )
-from .logger import Colors
 from .utils import get_file_size_bytes, get_output_format, get_output_path
 
 # Allow loading truncated images

@@ -1,7 +1,4 @@
-import sys
-from io import StringIO
-
-from imgbytesizer.formatter import format_filesize, print_result
+from imgbytesizer.formatter import format_filesize
 
 
 def test_format_filesize():
@@ -15,32 +12,5 @@ def test_format_filesize():
     assert format_filesize(1024, precision=0) == "1 KB"
     assert format_filesize(1024 * 1024 * 1.234, precision=3) == "1.234 MB"
 
-
-def test_print_result():
-    # Capture stdout
-    captured_output = StringIO()
-    sys.stdout = captured_output
-
-    # Test basic result
-    print_result("Test", "Value")
-    output = captured_output.getvalue()
-
-    # Reset stdout
-    sys.stdout = sys.__stdout__
-
-    # Check output
-    assert "Test:" in output
-    assert "Value" in output
-
-    # Test with status
-    captured_output = StringIO()
-    sys.stdout = captured_output
-
-    print_result("Test", "Value", "good")
-    output = captured_output.getvalue()
-
-    sys.stdout = sys.__stdout__
-
-    # Check output contains status
-    assert "Test:" in output
-    assert "Value" in output
+    # Test with None
+    assert format_filesize(None) == "N/A"
