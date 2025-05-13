@@ -5,6 +5,43 @@ All notable changes to imgbytesizer project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2025-05-13
+
+### Added
+
+- New GitHub Actions workflow for running tests (`.github/workflows/test.yml`).
+  - Includes steps for checking out repository, setting up Python, installing dependencies, running `pytest` with coverage, uploading coverage to Codecov, and running linters (`flake8`, `mypy`).
+- `.style.yapf` configuration file for YAPF Python formatter.
+- `.vscode/settings.json` to configure editor tab size, insert spaces, and default Python formatter to YAPF for VS Code users.
+- Added `eeyore.yapf` and `ms-python.mypy-type-checker` to VS Code recommended extensions (`.vscode/extensions.json`).
+- Added `indent-size = 2` to `.flake8` configuration.
+- Added entries to `.vulture_ignore.py` for mock objects used in tests.
+- Added Codecov badge to `README.md`.
+
+### Changed
+
+- **Development Environment & CI:**
+  - Updated `Makefile`:
+    - `test` target now specifies `tests/` directory and includes coverage flags: `pytest tests/ --cov=imgbytesizer --cov-report=xml`.
+    - `lint` target now runs `vulture imgbytesizer scripts tests .vulture_ignore.py`. `flake8 imgbytesizer scripts tests`. `ruff` check removed from this specific target.
+    - `format` target now uses `yapf -ir imgbytesizer scripts tests` instead of `ruff check . --fix` and `black .`.
+  - Updated VS Code recommended extensions: replaced `ms-python.autopep8` with `ms-python.mypy-type-checker` and added `eeyore.yapf`.
+- **Code Structure & Formatting:**
+  - Refactored formatting utilities:
+    - Moved `print_progress_bar`, `print_result`, `print_processing_step`, `print_comparison_table` from `imgbytesizer.formatter` to `imgbytesizer.logger`.
+    - `imgbytesizer.formatter` now primarily contains the `format_filesize` function.
+  - Imports in `imgbytesizer.main` updated to reflect moved utilities.
+  - Imports in `imgbytesizer.resizer` updated to reflect moved utilities.
+- **Logging & Output:**
+  - `imgbytesizer.logger.py` now also includes utility functions for printing progress bars, results, processing steps, and comparison tables, previously in `formatter.py`.
+  - `imgbytesizer.main.py` imports moved functions from `logger.py`.
+
+### Removed
+
+- Removed `ruff check .` from the `lint` target in `Makefile`.
+- Removed `ruff check . --fix` and `black .` from the `format` target in `Makefile`, replaced by `yapf`.
+- Most formatting utility functions (like `print_progress_bar`, `print_result`, etc.) were removed from `imgbytesizer.formatter.py` as they were relocated to `imgbytesizer.logger.py`.
+
 ## [0.2.1] - 2025-05-12
 
 ### Added
