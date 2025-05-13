@@ -1,4 +1,4 @@
-.PHONY: build test lint typecheck format clean
+.PHONY: build test lint format typecheck clean
 
 # Build the package
 build:
@@ -8,17 +8,18 @@ build:
 test:
 	pytest tests/ --cov=imgbytesizer --cov-report=xml
 
-# Run linters (Vulture for dead code)
+# Run linters (Flake8 for PEP8, Vulture for dead code)
 lint:
+	flake8 imgbytesizer scripts tests
 	vulture imgbytesizer scripts tests .vulture_ignore.py
-
-# Run static type checks
-typecheck:
-	mypy .
 
 # Auto-format code (YAPF for formatting)
 format:
 	yapf -ir imgbytesizer scripts tests
+
+# Run static type checks
+typecheck:
+	mypy imgbytesizer scripts tests
 
 # Clean build artifacts
 clean:

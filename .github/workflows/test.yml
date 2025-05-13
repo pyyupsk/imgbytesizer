@@ -49,6 +49,5 @@ jobs:
 
       - name: 🔍 Run linters
         run: |
-          flake8 imgbytesizer tests
-          black --check imgbytesizer tests
-          mypy imgbytesizer tests
+          flake8 imgbytesizer scripts tests
+          mypy imgbytesizer scripts tests
