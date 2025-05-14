@@ -39,6 +39,7 @@ jobs:
 
       - name: 🧪 Run tests
         run: |
+          source .venv/bin/activate
           make test
 
       - name: 📊 Upload coverage
@@ -51,5 +52,6 @@ jobs:
 
       - name: 🔍 Run linters
         run: |
+          source .venv/bin/activate
           make lint
           make typecheck
