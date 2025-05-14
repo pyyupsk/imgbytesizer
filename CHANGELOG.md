@@ -5,6 +5,29 @@ All notable changes to imgbytesizer project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2025-05-14
+
+### Added
+
+- Added ASCII art banner using pyfiglet
+- Added requirements sorting script (`scripts/sort_requirements.py`)
+- Added virtual environment setup in CI workflows
+- Added pyfiglet dependency for banner display
+
+### Changed
+
+- Switched from mypy to ty for type checking
+- Improved file size formatting with consistent decimal places
+- Reorganized CLI help groups for better readability
+- Enhanced type hints throughout the codebase
+- Improved GitHub Actions workflows with venv setup
+- Updated VS Code extensions recommendations
+
+### Fixed
+
+- Fixed file size formatting to use consistent decimal places
+- Improved type checking configuration
+
 ## [0.2.2] - 2025-05-13
 
 ### Added
