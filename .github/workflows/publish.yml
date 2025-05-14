@@ -31,6 +31,8 @@ jobs:
           cache: "pip"
       - name: 🔍 Install dependencies
         run: |
+          python -m venv .venv
+          source .venv/bin/activate
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
       - name: 🔍 Check version is not already published on PyPI
@@ -50,6 +52,8 @@ jobs:
           cache: "pip"
       - name: 🔍 Install dependencies
         run: |
+          python -m venv .venv
+          source .venv/bin/activate
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
       - name: 🏗 Build release
