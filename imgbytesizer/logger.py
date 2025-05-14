@@ -3,7 +3,7 @@ Logging utilities for imgbytesizer.
 """
 
 import logging
-from typing import Optional, Tuple, Final
+from typing import Final, Optional, Tuple, TextIO
 
 from .formatter import format_filesize
 
@@ -23,7 +23,7 @@ def setup_logger() -> logging.Logger:
   logger.setLevel(logging.INFO)
 
   # Create console handler
-  handler = logging.StreamHandler()  # type: ignore
+  handler: logging.StreamHandler[TextIO] = logging.StreamHandler()  # type: ignore
   handler.setLevel(logging.INFO)
 
   # Create formatter

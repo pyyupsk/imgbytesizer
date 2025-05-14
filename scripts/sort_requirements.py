@@ -4,8 +4,8 @@ Usage: python scripts/sort_requirements.py [directory]
 If no directory is specified, it will search in the current directory.
 """
 
-import os
 import glob
+import os
 import sys
 
 

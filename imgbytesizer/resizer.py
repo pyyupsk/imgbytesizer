@@ -7,7 +7,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Optional, Tuple, Union, Final
+from typing import Final, Optional, Tuple, Union
 
 from PIL import Image, ImageFile
 

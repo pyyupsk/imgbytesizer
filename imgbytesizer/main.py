@@ -7,15 +7,21 @@ import logging
 import sys
 from pathlib import Path
 
+from pyfiglet import Figlet
+
 from .logger import setup_logger
 from .resizer import resize_to_target_filesize
 from .utils import IMG_FORMATS, parse_filesize
+
+f: Figlet = Figlet(font='slant')
 
 
 def main() -> int:
   """Main entry point for the CLI."""
   # Setup logger
   logger: logging.Logger = setup_logger()
+
+  print(f.renderText('ImgByteSizer'))
 
   parser: argparse.ArgumentParser = argparse.ArgumentParser(
       description="Resize an image to match a target file size",
@@ -37,12 +43,12 @@ examples:
   parser.add_argument("target_size", nargs="?", help='Target file size (e.g., "1MB", "500KB")')
 
   # Primary options
-  primary = parser.add_argument_group("primary options")
+  primary: argparse._ArgumentGroup = parser.add_argument_group("primary options")
   primary.add_argument("-o", "--output", help="Output path (default: input_resized.ext)")
   primary.add_argument("-f", "--format", choices=IMG_FORMATS, help="Output format")
 
   # Advanced options
-  advanced = parser.add_argument_group("advanced options")
+  advanced: argparse._ArgumentGroup = parser.add_argument_group("advanced options")
   advanced.add_argument("--min-dimension", type=int, help="Minimum width/height in pixels")
   advanced.add_argument(
       "--no-exact",

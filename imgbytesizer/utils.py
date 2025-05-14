@@ -5,7 +5,7 @@ Utility functions for imgbytesizer.
 import io
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, Final
+from typing import Any, Dict, Final, List, Optional, Tuple, Union
 
 from PIL import Image
 
