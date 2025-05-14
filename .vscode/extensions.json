@@ -4,7 +4,7 @@
     "ms-python.debugpy",
     "ms-python.vscode-pylance",
     "ms-python.flake8",
-    "ms-python.mypy-type-checker",
+    "astral-sh.ty",
     "eeyore.yapf"
   ]
 }
