@@ -5,15 +5,15 @@ Utility functions for imgbytesizer.
 import io
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, Final
 
 from PIL import Image
 
 # Supported image formats
-IMG_FORMATS: List[str] = ["jpg", "jpeg", "png", "webp"]
+IMG_FORMATS: Final[List[str]] = ["jpg", "jpeg", "png", "webp"]
 
 # Logger
-logger = logging.getLogger("imgbytesizer")
+logger: logging.Logger = logging.getLogger("imgbytesizer")
 
 
 def parse_filesize(size_str: str) -> int:
@@ -43,7 +43,7 @@ def get_file_size_bytes(img: Image.Image,
                         format_name: str,
                         quality: Optional[int] = None) -> Tuple[int, io.BytesIO]:
   """Get the file size in bytes for an image with the specified format and quality."""
-  out_buffer = io.BytesIO()
+  out_buffer: io.BytesIO = io.BytesIO()
   save_args: Dict[str, Any] = {"format": format_name}
 
   # Apply quality settings based on format
@@ -62,7 +62,7 @@ def get_file_size_bytes(img: Image.Image,
 
   try:
     img.save(out_buffer, **save_args)
-    size = out_buffer.tell()
+    size: int = out_buffer.tell()
     logger.debug(f"Image size with {format_name}, quality {quality}: {size} bytes")
     return size, out_buffer
   except Exception as e:
@@ -72,10 +72,7 @@ def get_file_size_bytes(img: Image.Image,
 
 def get_output_format(input_format: str, requested_format: Optional[str] = None) -> str:
   """Determine the output format based on input and requested format."""
-  if requested_format:
-    format_name = requested_format.upper()
-  else:
-    format_name = input_format
+  format_name: str = requested_format.upper() if requested_format else input_format
 
   # Normalize format names
   if format_name == "JPG":
@@ -90,12 +87,13 @@ def get_output_path(
     format_name: Optional[str] = None,
 ) -> str:
   """Generate appropriate output path."""
-  path = Path(image_path)
+  path: Path = Path(image_path)
 
   if output_path:
     return output_path
 
   # Determine extension
+  ext: str
   if format_name:
     ext = format_name.lower()
     if ext == "jpeg":

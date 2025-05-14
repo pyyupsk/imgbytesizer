@@ -17,7 +17,7 @@ def test_print_result():
   sys.stdout = sys.__stdout__
 
   # Check output
-  assert "Test:" in output
+  assert output.startswith("Test")
   assert "Value" in output
 
   # Test with status
@@ -26,7 +26,7 @@ def test_print_result():
   print_result("Test", "Value", "good")
   output = captured_output.getvalue()
   sys.stdout = sys.__stdout__
-  assert "Test:" in output
+  assert output.startswith("Test")
   assert "Value" in output
 
   # Test with 'warning' status
@@ -35,7 +35,7 @@ def test_print_result():
   print_result("Test", "Value", "warning")
   output = captured_output.getvalue()
   sys.stdout = sys.__stdout__
-  assert "Test:" in output
+  assert output.startswith("Test")
   assert "Value" in output
 
   # Test with 'bad' status
@@ -44,5 +44,5 @@ def test_print_result():
   print_result("Test", "Value", "bad")
   output = captured_output.getvalue()
   sys.stdout = sys.__stdout__
-  assert "Test:" in output
+  assert output.startswith("Test")
   assert "Value" in output

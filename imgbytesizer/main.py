@@ -15,9 +15,9 @@ from .utils import IMG_FORMATS, parse_filesize
 def main() -> int:
   """Main entry point for the CLI."""
   # Setup logger
-  logger = setup_logger()
+  logger: logging.Logger = setup_logger()
 
-  parser = argparse.ArgumentParser(
+  parser: argparse.ArgumentParser = argparse.ArgumentParser(
       description="Resize an image to match a target file size",
       formatter_class=argparse.RawDescriptionHelpFormatter,
       epilog="""
@@ -30,22 +30,33 @@ Examples:
     """,
   )
 
+  # Version
+  parser.add_argument("-v", "--version", action="store_true", help="Show version information")
+
   parser.add_argument("image_path", nargs="?", help="Path to the input image")
   parser.add_argument("target_size", nargs="?", help='Target file size (e.g., "1MB", "500KB")')
-  parser.add_argument("-o", "--output", help="Output path (default: input_resized.ext)")
-  parser.add_argument("-f", "--format", choices=IMG_FORMATS, help="Output format")
-  parser.add_argument("--min-dimension", type=int, help="Minimum width/height in pixels")
-  parser.add_argument(
+
+  # Primary options
+  primary = parser.add_argument_group("primary options")
+  primary.add_argument("-o", "--output", help="Output path (default: input_resized.ext)")
+  primary.add_argument("-f", "--format", choices=IMG_FORMATS, help="Output format")
+
+  # Advanced options
+  advanced = parser.add_argument_group("advanced options")
+  advanced.add_argument("--min-dimension", type=int, help="Minimum width/height in pixels")
+  advanced.add_argument(
       "--no-exact",
       action="store_true",
       help="Do not pad file to get exact target size",
   )
-  parser.add_argument("-v", "--version", action="store_true", help="Show version information")
-  parser.add_argument("--debug", action="store_true", help="Enable debug logging")
-  parser.add_argument("-q", "--quiet", action="store_true", help="Minimal output")
+
+  # Utility and debug
+  utility = parser.add_argument_group("utility")
+  utility.add_argument("--debug", action="store_true", help="Enable debug logging")
+  utility.add_argument("-q", "--quiet", action="store_true", help="Minimal output")
 
   # Handle version flag before checking required arguments
-  args = parser.parse_args()
+  args: argparse.Namespace = parser.parse_args()
 
   # Handle version request
   if args.version:
@@ -66,19 +77,19 @@ Examples:
     return 0
 
   # Validate input file exists
-  image_path = Path(args.image_path)
+  image_path: Path = Path(args.image_path)
   if not image_path.exists():
     logger.error(f"Input file not found: {args.image_path}")
     return 1
 
   try:
-    target_bytes = parse_filesize(args.target_size)
+    target_bytes: int = parse_filesize(args.target_size)
   except ValueError as e:
     logger.error(f"Error: {e}")
     return 1
 
   try:
-    output_path = resize_to_target_filesize(
+    output_path: str = resize_to_target_filesize(
         args.image_path,
         target_bytes,
         args.output,

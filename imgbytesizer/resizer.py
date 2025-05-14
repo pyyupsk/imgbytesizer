@@ -7,7 +7,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Final
 
 from PIL import Image, ImageFile
 
@@ -21,7 +21,7 @@ from .utils import get_file_size_bytes, get_output_format, get_output_path
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # Get logger
-logger = logging.getLogger("imgbytesizer")
+logger: logging.Logger = logging.getLogger("imgbytesizer")
 
 
 def resize_to_target_filesize(
@@ -34,7 +34,7 @@ def resize_to_target_filesize(
     quiet: bool = False,
 ) -> str:
   """Resize an image to match a target file size in bytes."""
-  start_time = time.time()
+  start_time: float = time.time()
 
   # Load the image and get original info
   print_processing_step(
@@ -42,16 +42,18 @@ def resize_to_target_filesize(
   )
 
   try:
-    img = Image.open(image_path)
+    img: Image.Image = Image.open(image_path)
     img.load()  # Ensure image is fully loaded
   except Exception as e:
     logger.error(f"Could not open image: {e}")
     raise
 
+  orig_width: int
+  orig_height: int
   orig_width, orig_height = img.size
 
   # Normalize format names and determine output path
-  pil_format = get_output_format(img.format or "JPEG", format_name)
+  pil_format: str = get_output_format(img.format or "JPEG", format_name)
   output_path = get_output_path(image_path, output_path, pil_format)
 
   # Print image information if not in quiet mode
@@ -60,12 +62,12 @@ def resize_to_target_filesize(
     print_result("Format", pil_format)
     print_result("Dimensions", f"{orig_width} × {orig_height} pixels")
 
-    orig_size = os.path.getsize(image_path)
+    orig_size: int = os.path.getsize(image_path)
     print_result("Size", format_filesize(orig_size))
     print_result("Target size", format_filesize(target_size_bytes))
   else:
     # Even in quiet mode, we need the original size
-    orig_size = os.path.getsize(image_path)
+    orig_size: int = os.path.getsize(image_path)
 
   # Check if resizing is needed
   if orig_size <= target_size_bytes:
@@ -92,7 +94,9 @@ def resize_to_target_filesize(
   # For formats that support quality adjustment, try that first
   if pil_format in ["JPEG", "WEBP"]:
     # First, try quality adjustment with original dimensions
-    result = _try_quality_adjustment(img, pil_format, target_size_bytes, output_path, quiet)
+    result: Optional[str] = _try_quality_adjustment(
+        img, pil_format, target_size_bytes, output_path, quiet
+    )
 
     # If quality adjustment alone doesn't work (image too small),
     # try combined approach with resizing
@@ -122,7 +126,7 @@ def resize_to_target_filesize(
 
   # Fine-tuning to match exact target size if needed
   if exact_size and os.path.exists(output_path):
-    current_size = os.path.getsize(output_path)
+    current_size: int = os.path.getsize(output_path)
     if current_size < target_size_bytes:
       _adjust_to_exact_size(output_path, target_size_bytes, quiet)
     elif current_size > target_size_bytes and pil_format in ["JPEG", "WEBP"]:
@@ -133,9 +137,11 @@ def resize_to_target_filesize(
 
   # Final report if not in quiet mode
   if not quiet:
-    final_img = Image.open(output_path)
+    final_img: Image.Image = Image.open(output_path)
+    final_width: int
+    final_height: int
     final_width, final_height = final_img.size
-    final_size = os.path.getsize(output_path)
+    final_size: int = os.path.getsize(output_path)
 
     print_comparison_table(
         orig_size,
@@ -145,7 +151,7 @@ def resize_to_target_filesize(
         target_size_bytes,
     )
 
-    elapsed = time.time() - start_time
+    elapsed: float = time.time() - start_time
     print_result("Time taken", f"{elapsed:.2f} seconds")
     print_result(
         "Output file",
@@ -167,17 +173,20 @@ def _try_quality_adjustment(
     print("Trying quality adjustment without resizing...")
 
   # Start with wider quality range (1-100 instead of 1-95)
-  low, high = 1, 100
-  best_quality = None
-  best_size = None
-  best_buffer = None
-  iteration = 0
-  max_iterations = 12  # Increased from 10 for more precision
+  low: int = 1
+  high: int = 100
+  best_quality: Optional[int] = None
+  best_size: Optional[int] = None
+  best_buffer: Optional[io.BytesIO] = None
+  iteration: int = 0
+  max_iterations: int = 12  # Increased from 10 for more precision
 
   # Binary search for best quality
   while low <= high and iteration < max_iterations:
     iteration += 1
-    mid = (low + high) // 2
+    mid: int = (low + high) // 2
+    size: int
+    buffer: io.BytesIO
     size, buffer = get_file_size_bytes(img, pil_format, mid)
 
     if not quiet:
@@ -234,24 +243,24 @@ def _try_combined_approach(
 
   # Try a series of scale factors, starting from original size and going up
   # This helps when the image is too small to reach the target size with quality alone
-  scale_factors = [1.0, 1.25, 1.5, 2.0, 3.0]
+  scale_factors: Final[list[float]] = [1.0, 1.25, 1.5, 2.0, 3.0]
 
-  best_size = None
-  best_buffer = None
-  best_scale = None
+  best_size: Optional[int] = None
+  best_buffer: Optional[io.BytesIO] = None
+  best_scale: Optional[float] = None
 
   for scale in scale_factors:
-    new_width = int(orig_width * scale)
-    new_height = int(orig_height * scale)
+    new_width: int = int(orig_width * scale)
+    new_height: int = int(orig_height * scale)
 
     # Apply minimum dimension constraint if specified
     if min_dimension is not None:
       if new_width < min_dimension or new_height < min_dimension:
-        scale_w = min_dimension / new_width if new_width < min_dimension else 1
-        scale_h = (min_dimension / new_height if new_height < min_dimension else 1)
-        scale_adj = max(scale_w, scale_h)
-        new_width = max(min_dimension, int(new_width * scale_adj))
-        new_height = max(min_dimension, int(new_height * scale_adj))
+        scale_w: float = min_dimension / new_width if new_width < min_dimension else 1
+        scale_h: float = min_dimension / new_height if new_height < min_dimension else 1
+        scale = max(scale_w, scale_h)
+        new_width = int(orig_width * scale)
+        new_height = int(orig_height * scale)
 
     if not quiet:
       print(f"Trying scale factor {scale:.2f} ({new_width}×{new_height})...")
@@ -261,16 +270,19 @@ def _try_combined_approach(
       continue
 
     # Use LANCZOS for best quality
-    resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    resized_img: Image.Image = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
     # Try quality adjustment for this size
-    low, high = 1, 100
-    best_size_for_scale = None
-    best_buffer_for_scale = None
+    low: int = 1
+    high: int = 100
+    best_size_for_scale: Optional[int] = None
+    best_buffer_for_scale: Optional[io.BytesIO] = None
 
     # Binary search for quality
     for _ in range(10):  # Limit iterations
-      mid = (low + high) // 2
+      mid: int = (low + high) // 2
+      size: int
+      buffer: io.BytesIO
       size, buffer = get_file_size_bytes(resized_img, pil_format, mid)
 
       if not quiet:
@@ -342,25 +354,25 @@ def _try_resizing(
   if not quiet:
     print("Performing size-based optimization...")
 
-  low_scale = 0.01
-  high_scale = 1.0
-  best_size = None
-  best_buffer = None
-  best_scale = None
-  iterations = 0
-  max_iterations = 12  # Limit iterations for binary search
+  low_scale: float = 0.01
+  high_scale: float = 1.0
+  best_size: Optional[int] = None
+  best_buffer: Optional[io.BytesIO] = None
+  best_scale: Optional[float] = None
+  iterations: int = 0
+  max_iterations: int = 12  # Limit iterations for binary search
 
   while high_scale - low_scale > 0.005 and iterations < max_iterations:
     iterations += 1
-    mid_scale = (low_scale + high_scale) / 2
-    new_width = max(1, int(orig_width * mid_scale))
-    new_height = max(1, int(orig_height * mid_scale))
+    mid_scale: float = (low_scale + high_scale) / 2
+    new_width: int = max(1, int(orig_width * mid_scale))
+    new_height: int = max(1, int(orig_height * mid_scale))
 
     # Apply minimum dimension constraint if specified
     if min_dimension is not None:
       if new_width < min_dimension or new_height < min_dimension:
-        scale_w = min_dimension / new_width if new_width < min_dimension else 1
-        scale_h = (min_dimension / new_height if new_height < min_dimension else 1)
+        scale_w: float = min_dimension / new_width if new_width < min_dimension else 1
+        scale_h: float = min_dimension / new_height if new_height < min_dimension else 1
         scale = max(scale_w, scale_h)
         new_width = max(min_dimension, int(new_width * scale))
         new_height = max(min_dimension, int(new_height * scale))
@@ -369,9 +381,11 @@ def _try_resizing(
       print_processing_step(iterations, f"Trying scale {mid_scale:.2f} ({new_width}×{new_height})")
 
     # Use LANCZOS for best quality
-    resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    resized_img: Image.Image = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
     # Try to find best quality for this size
+    size: int
+    buffer: io.BytesIO
     size, buffer = _find_best_quality(resized_img, pil_format, target_size_bytes, quiet)
 
     # Update best if this is closest to target without going over
@@ -390,11 +404,13 @@ def _try_resizing(
 
   if best_buffer is None:
     # Last resort: use the smallest possible size with lowest quality
-    smallest_width = 1 if min_dimension is None else min_dimension
-    smallest_height = 1 if min_dimension is None else min_dimension
-    tiny_img = img.resize((smallest_width, smallest_height), Image.Resampling.LANCZOS)
+    smallest_width: int = 1 if min_dimension is None else min_dimension
+    smallest_height: int = 1 if min_dimension is None else min_dimension
+    tiny_img: Image.Image = img.resize((smallest_width, smallest_height), Image.Resampling.LANCZOS)
 
-    min_quality = 1  # Lowest possible quality
+    min_quality: int = 1  # Lowest possible quality
+    size: int
+    buffer: io.BytesIO
     size, buffer = get_file_size_bytes(tiny_img, pil_format, min_quality)
 
     # Write this as our best attempt
@@ -415,9 +431,9 @@ def _try_resizing(
 
   if not quiet:
     if best_size is not None:
-      found_size = format_filesize(best_size)
+      found_size: str = format_filesize(best_size)
     else:
-      found_size = "Unknown"
+      found_size: str = "Unknown"
 
     print(
         f"\n{Colors.GREEN}✓ Found optimal size: {found_size} with scale "
@@ -434,15 +450,18 @@ def _find_best_quality(
     quiet: bool = False
 ) -> Tuple[int, io.BytesIO]:
   """Find the best quality setting for a given image size."""
-  low, high = 1, 100  # Extended to 100 from 95
-  best_size = None
-  best_buffer = None
-  iteration = 0
-  max_iterations = 12  # Increased from 10
+  low: int = 1
+  high: int = 100  # Extended to 100 from 95
+  best_size: Optional[int] = None
+  best_buffer: Optional[io.BytesIO] = None
+  iteration: int = 0
+  max_iterations: int = 12  # Increased from 10
 
   while low <= high and iteration < max_iterations:
     iteration += 1
-    mid = (low + high) // 2
+    mid: int = (low + high) // 2
+    size: int
+    buffer: io.BytesIO
     size, buffer = get_file_size_bytes(img, pil_format, mid)
 
     if not quiet:
@@ -468,6 +487,8 @@ def _find_best_quality(
 
   if best_buffer is None:
     # If all qualities exceed target, use lowest quality
+    size: int
+    buffer: io.BytesIO
     size, buffer = get_file_size_bytes(img, pil_format, 1)
     return size, buffer
 
@@ -483,20 +504,23 @@ def _final_quality_adjustment(
 ) -> None:
   """Make a final quality adjustment to get closer to target size."""
   try:
-    img = Image.open(image_path)
+    img: Image.Image = Image.open(image_path)
 
     # Get current size
-    current_size = os.path.getsize(image_path)
+    current_size: int = os.path.getsize(image_path)
 
     if current_size <= target_size_bytes:
       return
 
     # Try to reduce quality to get closer to target
-    low, high = 1, 100
-    best_buffer = None
+    low: int = 1
+    high: int = 100
+    best_buffer: Optional[io.BytesIO] = None
 
     for _ in range(8):  # Limit iterations for speed
-      mid = (low + high) // 2
+      mid: int = (low + high) // 2
+      size: int
+      buffer: io.BytesIO
       size, buffer = get_file_size_bytes(img, pil_format, mid)
 
       if size <= target_size_bytes:
@@ -519,10 +543,10 @@ def _adjust_to_exact_size(output_path: str, target_size_bytes: int, quiet: bool 
     print("Adjusting to exact target size...")
 
   # Read the current image
-  current_size = os.path.getsize(output_path)
+  current_size: int = os.path.getsize(output_path)
 
   # Calculate padding needed
-  padding_needed = max(0, target_size_bytes - current_size)
+  padding_needed: int = max(0, target_size_bytes - current_size)
   if padding_needed <= 0:
     return
 

@@ -2,17 +2,16 @@
 Terminal formatting utilities for imgbytesizer.
 """
 
-from typing import Optional
+from typing import Union
 
 
-def format_filesize(size_bytes: Optional[float], precision: int = 2) -> str:
-  """Format file size in a human-readable format."""
+def format_filesize(size_bytes: Union[int, float, None]) -> str:
+  """Format file size in bytes to human-readable string."""
   if size_bytes is None:
     return "N/A"
-
-  if size_bytes < 1024:
-    return f"{size_bytes:.{precision}f} B"
-  elif size_bytes < 1024 * 1024:
-    return f"{size_bytes / 1024:.{precision}f} KB"
-  else:
-    return f"{size_bytes / (1024 * 1024):.{precision}f} MB"
+  size: float = float(size_bytes)
+  for unit in ["B", "KB", "MB", "GB"]:
+    if size < 1024:
+      return f"{size:.1f}{unit}"
+    size /= 1024
+  return f"{size:.1f}TB"
