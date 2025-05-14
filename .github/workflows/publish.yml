@@ -36,7 +36,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
       - name: 🔍 Check version is not already published on PyPI
-        run: python scripts/check_version.py
+        run: |
+          source .venv/bin/activate
+          python scripts/check_version.py
 
   release-build:
     runs-on: ubuntu-latest
