@@ -19,7 +19,7 @@ format:
 
 # Run static type checks
 typecheck:
-	mypy imgbytesizer scripts tests
+	ty check imgbytesizer scripts tests
 
 # Clean build artifacts
 clean:

@@ -1,6 +1,6 @@
 import logging
 import sys
-from typing import ClassVar, Dict, Optional, Tuple
+from typing import ClassVar, Optional, Tuple
 
 from tabulate import tabulate
 
@@ -25,37 +25,9 @@ class Colors:
     return sys.stdout.isatty()
 
 
-class ColoredFormatter(logging.Formatter):
-  """Custom formatter for colored console output."""
-
-  FORMATS: ClassVar[Dict[int, str]] = {
-      logging.DEBUG: Colors.BLUE + "%(message)s" + Colors.ENDC,
-      logging.INFO: "%(message)s",
-      logging.WARNING: Colors.YELLOW + "%(message)s" + Colors.ENDC,
-      logging.ERROR: Colors.RED + Colors.BOLD + "%(message)s" + Colors.ENDC,
-      logging.CRITICAL: Colors.RED + Colors.BOLD + "%(message)s" + Colors.ENDC,
-  }
-
-  def format(self, record: logging.LogRecord) -> str:
-    log_fmt = self.FORMATS.get(record.levelno)
-    formatter = logging.Formatter(log_fmt)
-    return formatter.format(record)
-
-
 def setup_logger() -> logging.Logger:
   """Setup and return the application logger."""
   logger = logging.getLogger("imgbytesizer")
-
-  if not logger.handlers:
-    handler = logging.StreamHandler(sys.stdout)
-
-    if Colors.supports_color():
-      handler.setFormatter(ColoredFormatter())
-    else:
-      handler.setFormatter(logging.Formatter("%(message)s"))
-
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
 
   return logger
 
