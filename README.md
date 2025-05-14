@@ -47,7 +47,7 @@ imgbytesizer large_image.jpg 300KB --min-dimension 400
 ### Command-Line Options
 
 ```bash
-usage: imgbytesizer [-h] [-o OUTPUT] [-f {jpg,jpeg,png,webp}] [--min-dimension MIN_DIMENSION] [--no-exact] [-v] [--debug] [-q] [image_path] [target_size]
+usage: imgbytesizer [-h] [-o OUTPUT] [-f {jpg,jpeg,png,webp}] [--min-dimension MIN_DIMENSION] [--no-exact] [--debug] [-q] [-v] [image_path] [target_size]
 
 Resize an image to match a target file size
 
@@ -57,15 +57,28 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
+  -v, --version         Show version information
+
+primary options:
   -o, --output OUTPUT   Output path (default: input_resized.ext)
   -f, --format {jpg,jpeg,png,webp}
                         Output format
+
+advanced options:
   --min-dimension MIN_DIMENSION
                         Minimum width/height in pixels
   --no-exact            Do not pad file to get exact target size
-  -v, --version         Show version information
+
+utility:
   --debug               Enable debug logging
   -q, --quiet           Minimal output
+
+examples:
+  imgbytesizer image.jpg 500KB                   # Resize to 500 KB
+  imgbytesizer photo.png 2MB -o small_photo.png  # Resize to 2 MB with custom output
+  imgbytesizer image.jpg 100KB -f webp           # Resize and convert to WebP
+  imgbytesizer large.jpg 50KB --min-dimension 200  # Ensure min dimension is 200px
+  imgbytesizer -v                                # Show version information
 ```
 
 ## How It Works

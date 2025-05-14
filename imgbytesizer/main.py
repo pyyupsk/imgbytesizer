@@ -21,7 +21,7 @@ def main() -> int:
       description="Resize an image to match a target file size",
       formatter_class=argparse.RawDescriptionHelpFormatter,
       epilog="""
-Examples:
+examples:
   %(prog)s image.jpg 500KB                   # Resize to 500 KB
   %(prog)s photo.png 2MB -o small_photo.png  # Resize to 2 MB with custom output
   %(prog)s image.jpg 100KB -f webp           # Resize and convert to WebP
