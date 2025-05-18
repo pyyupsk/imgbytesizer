@@ -29,7 +29,7 @@ def test_image(tmp_path):
 
 
 def test_main_entrypoint(tmp_path):
-  script_path = Path(__file__).parent.parent / "imgbytesizer" / "main.py"
+  script_path = Path(__file__).parent.parent / "src" / "imgbytesizer" / "main.py"
   test_image = tmp_path / "test.jpg"
   test_image.touch()
 

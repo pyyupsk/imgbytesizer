@@ -13,7 +13,11 @@ from PIL import Image, ImageFile
 
 from .formatter import format_filesize
 from .logger import (
-    Colors, print_comparison_table, print_processing_step, print_progress_bar, print_result
+    Colors,
+    print_comparison_table,
+    print_processing_step,
+    print_progress_bar,
+    print_result,
 )
 from .utils import get_file_size_bytes, get_output_format, get_output_path
 
@@ -256,8 +260,8 @@ def _try_combined_approach(
     # Apply minimum dimension constraint if specified
     if min_dimension is not None:
       if new_width < min_dimension or new_height < min_dimension:
-        scale_w: float = min_dimension / new_width if new_width < min_dimension else 1
-        scale_h: float = min_dimension / new_height if new_height < min_dimension else 1
+        scale_w: float = (min_dimension / new_width if new_width < min_dimension else 1)
+        scale_h: float = (min_dimension / new_height if new_height < min_dimension else 1)
         scale = max(scale_w, scale_h)
         new_width = int(orig_width * scale)
         new_height = int(orig_height * scale)
@@ -371,8 +375,8 @@ def _try_resizing(
     # Apply minimum dimension constraint if specified
     if min_dimension is not None:
       if new_width < min_dimension or new_height < min_dimension:
-        scale_w: float = min_dimension / new_width if new_width < min_dimension else 1
-        scale_h: float = min_dimension / new_height if new_height < min_dimension else 1
+        scale_w: float = (min_dimension / new_width if new_width < min_dimension else 1)
+        scale_h: float = (min_dimension / new_height if new_height < min_dimension else 1)
         scale = max(scale_w, scale_h)
         new_width = max(min_dimension, int(new_width * scale))
         new_height = max(min_dimension, int(new_height * scale))

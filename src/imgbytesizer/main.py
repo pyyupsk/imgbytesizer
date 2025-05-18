@@ -13,7 +13,7 @@ from .logger import setup_logger
 from .resizer import resize_to_target_filesize
 from .utils import IMG_FORMATS, parse_filesize
 
-f: Figlet = Figlet(font='slant')
+f: Figlet = Figlet(font="slant")
 
 
 def main() -> int:
@@ -21,7 +21,7 @@ def main() -> int:
   # Setup logger
   logger: logging.Logger = setup_logger()
 
-  print(f.renderText('ImgByteSizer'))
+  print(f.renderText("ImgByteSizer"))
 
   parser: argparse.ArgumentParser = argparse.ArgumentParser(
       description="Resize an image to match a target file size",

@@ -2,7 +2,7 @@
 
 # Build the package
 build:
-	python -m build
+	poetry build
 
 # Run tests
 test:
