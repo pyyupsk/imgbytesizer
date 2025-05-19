@@ -163,10 +163,15 @@ imgbytesizer profile_pic.jpg 400KB --min-dimension 400
 
 ## Requirements
 
-- Python 3.9+
-- Dependencies:
-  - Pillow >= 11.0.0
-  - tabulate >= 0.9.0
+```toml
+requires-python = ">=3.9"
+
+dependencies = [
+  "pillow (>=11.2.1,<12.0.0)",
+  "pyfiglet (>=1.0.2,<2.0.0)",
+  "tabulate (>=0.9.0,<0.10.0)",
+]
+```
 
 ## Contributing
 
