@@ -13,11 +13,7 @@ from PIL import Image, ImageFile
 
 from .formatter import format_filesize
 from .logger import (
-    Colors,
-    print_comparison_table,
-    print_processing_step,
-    print_progress_bar,
-    print_result,
+    Colors, print_comparison_table, print_processing_step, print_progress_bar, print_result
 )
 from .utils import get_file_size_bytes, get_output_format, get_output_path
 

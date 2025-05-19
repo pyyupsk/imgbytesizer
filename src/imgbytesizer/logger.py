@@ -3,7 +3,7 @@ Logging utilities for imgbytesizer.
 """
 
 import logging
-from typing import Final, Optional, Tuple, TextIO
+from typing import Final, Optional, TextIO, Tuple
 
 from .formatter import format_filesize
 
