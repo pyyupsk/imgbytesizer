@@ -1,4 +1,4 @@
-name: 🧪 Test
+name: 🧪 CI
 
 on:
   push:
@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,22 +25,22 @@ jobs:
       - uses: actions/setup-python@v5
         name: 📦 Setup Python
         with:
-          python-version: "3.9"
-          cache: "pip"
+          python-version: 3.9
+
+      - name: 📦 Install Poetry
+        uses: abatilo/actions-poetry@v4.0.0
+        with:
+          poetry-version: latest
 
       - name: 🔍 Install dependencies
         run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-          pip install -e .
+          export PATH="/root/.local/bin:$PATH"
+          poetry install
 
-      - name: 🧪 Run tests
+      - name: 🧪 Run testsenv
         run: |
-          source .venv/bin/activate
-          make test
+          export PATH="/root/.local/bin:$PATH"
+          poetry run tox
 
       - name: 📊 Upload coverage
         uses: codecov/codecov-action@v5
@@ -49,9 +49,3 @@ jobs:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
-
-      - name: 🔍 Run linters
-        run: |
-          source .venv/bin/activate
-          make lint
-          make typecheck
