@@ -5,6 +5,24 @@ All notable changes to imgbytesizer project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2025-05-15
+
+### Changed
+
+- Switched to Poetry for dependency management; removed requirements.txt and requirements-dev.txt
+- Added poetry.lock and updated pyproject.toml with [tool.poetry] and dev dependencies
+- Added tox.ini for unified test/lint/typecheck/build automation
+- Updated Makefile to use poetry for build
+- Refactored project structure: all code now under src/imgbytesizer/
+- Updated all scripts, tests, and CI/CD to use new src/ layout
+- Improved and unified GitHub Actions workflows for CI and publishing
+- Removed scripts/sort_requirements.py (no longer needed)
+
+### Fixed
+
+- Path issues in tests and scripts due to src/ layout
+- Minor type hint and formatting tweaks
+
 ## [0.2.3] - 2025-05-14
 
 ### Added
