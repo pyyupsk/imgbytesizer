@@ -91,7 +91,7 @@ def test_img_formats():
 
 def test_get_file_size_bytes_png_with_quality():
   img = Image.new("RGB", (50, 50), color="blue")
-  size, buffer = get_file_size_bytes(img, "PNG", quality=80)
+  size, _buffer = get_file_size_bytes(img, "PNG", quality=80)
   assert size > 0
 
 
