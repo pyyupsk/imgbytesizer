@@ -3,6 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/imgbytesizer.svg)](https://pypi.org/project/imgbytesizer/)
 [![PyPI Downloads](https://static.pepy.tech/badge/imgbytesizer)](https://pepy.tech/projects/imgbytesizer)
 [![codecov](https://codecov.io/gh/pyyupsk/imgbytesizer/graph/badge.svg?token=GJH6N3ZAJS)](https://codecov.io/gh/pyyupsk/imgbytesizer)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pyyupsk_imgbytesizer&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pyyupsk_imgbytesizer)
 
 ImgByteSizer is a command-line tool that precisely resizes and optimizes images to match a specific file size while maintaining the best possible quality.
 
