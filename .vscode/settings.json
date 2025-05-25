@@ -7,5 +7,9 @@
     "editor.formatOnSaveMode": "file",
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "eeyore.yapf"
+  },
+  "sonarlint.connectedMode.project": {
+    "connectionId": "pyyupsk",
+    "projectKey": "pyyupsk_imgbytesizer"
   }
 }
