@@ -5,6 +5,18 @@ All notable changes to imgbytesizer project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2025-05-16
+
+### Changed
+
+- Refactored resizer.py for better code organization and maintainability:
+  - Split large functions into smaller, focused ones
+  - Added new helper functions for better code reuse
+  - Improved type hints and documentation
+  - Enhanced test coverage with new test cases
+- Improved error handling and edge cases in image processing
+- Enhanced binary search algorithms for better quality/size optimization
+
 ## [0.2.4] - 2025-05-15
 
 ### Changed

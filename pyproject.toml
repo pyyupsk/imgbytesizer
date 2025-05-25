@@ -1,6 +1,6 @@
 [project]
 name = "imgbytesizer"
-version = "0.2.4"
+version = "0.2.5"
 description = "A CLI tool to resize images to a target file size."
 keywords = ["image", "resize", "compression", "cli", "optimize"]
 
