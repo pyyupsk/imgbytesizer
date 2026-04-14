@@ -30,20 +30,14 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: 📦 Install Poetry
-        uses: abatilo/actions-poetry@3765cf608f2d4a72178a9fc5b918668e542b89b1 # v4.0.0
-        with:
-          poetry-version: latest
+      - uses: astral-sh/setup-uv@6b9c6063abd6010835644d4c2e1bef4cf5cd0fca # v6.0.1
+        name: 📦 Setup uv
 
       - name: 🔍 Install dependencies
-        run: |
-          export PATH="/root/.local/bin:$PATH"
-          poetry install --with dev
+        run: uv sync
 
       - name: 🔍 Check version is not already published on PyPI
-        run: |
-          export PATH="/root/.local/bin:$PATH"
-          poetry run python scripts/check_version.py
+        run: uv run python scripts/check_version.py
 
   release-build:
     runs-on: ubuntu-latest
@@ -58,20 +52,14 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: 📦 Install Poetry
-        uses: abatilo/actions-poetry@3765cf608f2d4a72178a9fc5b918668e542b89b1 # v4.0.0
-        with:
-          poetry-version: latest
+      - uses: astral-sh/setup-uv@6b9c6063abd6010835644d4c2e1bef4cf5cd0fca # v6.0.1
+        name: 📦 Setup uv
 
       - name: 🔍 Install dependencies
-        run: |
-          export PATH="/root/.local/bin:$PATH"
-          poetry install --with dev
+        run: uv sync
 
       - name: 🏗 Build release
-        run: |
-          export PATH="/root/.local/bin:$PATH"
-          poetry run tox -e build
+        run: uv run tox -e build
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         name: 📤 Upload artifact

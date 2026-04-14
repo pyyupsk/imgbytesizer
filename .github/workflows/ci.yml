@@ -27,20 +27,14 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: 📦 Install Poetry
-        uses: abatilo/actions-poetry@3765cf608f2d4a72178a9fc5b918668e542b89b1 # v4.0.0
-        with:
-          poetry-version: latest
+      - uses: astral-sh/setup-uv@6b9c6063abd6010835644d4c2e1bef4cf5cd0fca # v6.0.1
+        name: 📦 Setup uv
 
       - name: 🔍 Install dependencies
-        run: |
-          export PATH="/root/.local/bin:$PATH"
-          poetry install
+        run: uv sync
 
-      - name: 🧪 Run testsenv
-        run: |
-          export PATH="/root/.local/bin:$PATH"
-          poetry run tox
+      - name: 🧪 Run tests
+        run: uv run tox
 
       - name: 📊 Upload coverage
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
