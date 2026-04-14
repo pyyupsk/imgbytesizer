@@ -1,181 +1,154 @@
 # Changelog
 
-All notable changes to imgbytesizer project will be documented in this file.
+All notable changes to imgbytesizer will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.2.6] - 2026-04-14
 
+### 🐛 Bug Fixes
+
+- Resolve ty type checker errors in logger and resizer
+
+### 💼 Other
+
+- Migrate from poetry to uv
+- Add release automation with git-cliff and release script
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG for v0.2.5 release date change to 2025-05-25
+- Pin actions to commit SHAs and bump Python to 3.10
 ## [0.2.5] - 2025-05-25
 
-### Changed
+### 📚 Documentation
 
-- Refactored resizer.py for better code organization and maintainability:
-  - Split large functions into smaller, focused ones
-  - Added new helper functions for better code reuse
-  - Improved type hints and documentation
-  - Enhanced test coverage with new test cases
-- Improved error handling and edge cases in image processing
-- Enhanced binary search algorithms for better quality/size optimization
+- Add Quality Gate Status badge to README for better visibility of code quality
 
-## [0.2.4] - 2025-05-15
+### 🧪 Testing
 
-### Changed
+- Add and improve tests for image setup, format conversion, and size adjustments
 
-- Switched to Poetry for dependency management; removed requirements.txt and requirements-dev.txt
-- Added poetry.lock and updated pyproject.toml with [tool.poetry] and dev dependencies
-- Added tox.ini for unified test/lint/typecheck/build automation
-- Updated Makefile to use poetry for build
-- Refactored project structure: all code now under src/imgbytesizer/
-- Updated all scripts, tests, and CI/CD to use new src/ layout
-- Improved and unified GitHub Actions workflows for CI and publishing
-- Removed scripts/sort_requirements.py (no longer needed)
+### ⚙️ Miscellaneous Tasks
 
-### Fixed
+- Refactor resize_to_target_filesize; add image helpers for setup, format, scaling; improve clarity
+## [0.2.4] - 2025-05-19
 
-- Path issues in tests and scripts due to src/ layout
-- Minor type hint and formatting tweaks
+### ⚙️ Miscellaneous Tasks
 
+- Switch from build to poetry for package building, add poetry.lock, and remove requirements files
+- Update poetry.lock; adjust tox.ini for command order and cleanup
+- Add CI workflow for automated testing and coverage reporting; update publish workflow for Poetry integration
+- Add imgbytesizer script entry point in pyproject.toml
+- Tidy up imports in logger, resizer, and test files for better readability
 ## [0.2.3] - 2025-05-14
 
-### Added
+### 🐛 Bug Fixes
 
-- Added ASCII art banner using pyfiglet
-- Added requirements sorting script (`scripts/sort_requirements.py`)
-- Added virtual environment setup in CI workflows
-- Added pyfiglet dependency for banner display
+- Update type checking to use 'ty', adjust file size formatting, and clean up logger setup
 
-### Changed
+### 🚜 Refactor
 
-- Switched from mypy to ty for type checking
-- Improved file size formatting with consistent decimal places
-- Reorganized CLI help groups for better readability
-- Enhanced type hints throughout the codebase
-- Improved GitHub Actions workflows with venv setup
-- Updated VS Code extensions recommendations
+- Enhance type annotations, improve file size formatting, and streamline logger setup
 
-### Fixed
+### 📚 Documentation
 
-- Fixed file size formatting to use consistent decimal places
-- Improved type checking configuration
+- Update README and main.py for consistent example formatting and added version flag
 
+### ⚙️ Miscellaneous Tasks
+
+- Add script to sort requirements files and ensure consistent ordering
+- Replace mypy type checker with 'ty' in VSCode extensions
+- Add pyfiglet dependency, enhance type annotations in logger and main modules, and tidy up imports
+- Add virtual environment setup in GitHub Actions for publish and test workflows
+- Activate virtual environment in GitHub Actions for build, test, and lint jobs
+- Activate virtual environment in publish workflow before version check
 ## [0.2.2] - 2025-05-13
 
-### Added
+### 🚜 Refactor
 
-- New GitHub Actions workflow for running tests (`.github/workflows/test.yml`).
-  - Includes steps for checking out repository, setting up Python, installing dependencies, running `pytest` with coverage, uploading coverage to Codecov, and running linters (`flake8`, `mypy`).
-- `.style.yapf` configuration file for YAPF Python formatter.
-- `.vscode/settings.json` to configure editor tab size, insert spaces, and default Python formatter to YAPF for VS Code users.
-- Added `eeyore.yapf` and `ms-python.mypy-type-checker` to VS Code recommended extensions (`.vscode/extensions.json`).
-- Added `indent-size = 2` to `.flake8` configuration.
-- Added entries to `.vulture_ignore.py` for mock objects used in tests.
-- Added Codecov badge to `README.md`.
+- Clean up formatter and logger by removing unused functions and consolidating imports
 
-### Changed
+### 🧪 Testing
 
-- **Development Environment & CI:**
-  - Updated `Makefile`:
-    - `test` target now specifies `tests/` directory and includes coverage flags: `pytest tests/ --cov=imgbytesizer --cov-report=xml`.
-    - `lint` target now runs `vulture imgbytesizer scripts tests .vulture_ignore.py`. `flake8 imgbytesizer scripts tests`. `ruff` check removed from this specific target.
-    - `format` target now uses `yapf -ir imgbytesizer scripts tests` instead of `ruff check . --fix` and `black .`.
-  - Updated VS Code recommended extensions: replaced `ms-python.autopep8` with `ms-python.mypy-type-checker` and added `eeyore.yapf`.
-- **Code Structure & Formatting:**
-  - Refactored formatting utilities:
-    - Moved `print_progress_bar`, `print_result`, `print_processing_step`, `print_comparison_table` from `imgbytesizer.formatter` to `imgbytesizer.logger`.
-    - `imgbytesizer.formatter` now primarily contains the `format_filesize` function.
-  - Imports in `imgbytesizer.main` updated to reflect moved utilities.
-  - Imports in `imgbytesizer.resizer` updated to reflect moved utilities.
-- **Logging & Output:**
-  - `imgbytesizer.logger.py` now also includes utility functions for printing progress bars, results, processing steps, and comparison tables, previously in `formatter.py`.
-  - `imgbytesizer.main.py` imports moved functions from `logger.py`.
+- Add comprehensive tests for main functionality and resizer edge cases
+- Add entrypoint test and improve utility tests for image handling
 
-### Removed
+### ⚙️ Miscellaneous Tasks
 
-- Removed `ruff check .` from the `lint` target in `Makefile`.
-- Removed `ruff check . --fix` and `black .` from the `format` target in `Makefile`, replaced by `yapf`.
-- Most formatting utility functions (like `print_progress_bar`, `print_result`, etc.) were removed from `imgbytesizer.formatter.py` as they were relocated to `imgbytesizer.logger.py`.
-
+- Update Makefile and requirements for linting and formatting improvements
+- Add GitHub Actions workflow for testing and linting, update file size formatting function
+- Update Makefile to run tests with coverage and add pytest-cov to requirements
+- Add requirements.txt installation step to GitHub Actions workflow
+- Add editable install step for local development in GitHub Actions workflow
+- Update codecov action to v5 and add token and verbose options in GitHub Actions workflow
+- Remove isort from formatting and requirements, update code style in imports
+- Add Codecov badge to README for better visibility of test coverage
+- Update formatting and linting configurations, add YAPF style guide, and adjust flake8 settings
+- Add mypy type checker and YAPF formatter to VSCode extensions
+- Update Makefile and GitHub Actions for improved linting and type checking
 ## [0.2.1] - 2025-05-12
 
-### Added
+### 🚀 Features
 
-- Implemented a new combined strategy of image upscaling and quality adjustment to better achieve target file sizes, especially when the original image is smaller than the target (`resizer.py`). This includes the `_try_combined_approach` function.
-- Integrated `pytest` for automated testing, including a new `test` target in `Makefile` and a test execution step in the CI pipeline (`.github/workflows/publish.yml`, `Makefile`).
-- Added `.flake8` configuration file with `max-line-length = 100`.
+- Enhance GitHub Actions workflow to create or update releases based on existence, improving asset handling
+- Add testing framework with pytest, update Makefile for test execution, and configure flake8 for code style enforcement
+- Update Makefile for improved linting and formatting, add ruff for linting and autofix, enhance type hints across the codebase
+- Enhance image resizing logic with combined scaling and quality adjustment, improve error handling, and extend quality range for better results
+- Add CI tests to GitHub Actions workflow, including Python setup and dependency installation
 
-### Changed
+### 🐛 Bug Fixes
 
-- **Resizing Core Logic:**
-  - Quality adjustment algorithm (`_try_quality_adjustment`, `_find_best_quality`) now uses a wider quality range (1-100, up from 1-95) and increased iterations (e.g., 12 from 10) for more precise results (`resizer.py`).
-  - Binary search for optimal quality during resizing has been refined for better accuracy, attempting higher qualities if current size is under target and lower if over (`resizer.py`).
-  - Resizing algorithm's (`_try_resizing`) binary search for scale factor now uses more iterations and finer step adjustments for scale (e.g., `high_scale - low_scale > 0.005`) (`resizer.py`).
-  - Updated image resampling to use `Image.Resampling.LANCZOS` (modern Pillow API) instead of deprecated `Image.LANCZOS` (`resizer.py`).
-  - Fallback image format for output path generation is now 'JPEG' if the original image format is undefined (e.g., `img.format or "JPEG"`) (`resizer.py`).
-  - Logic for final adjustment to exact size improved, including handling cases where the image is larger than the target after initial processing by attempting a final quality adjustment (`_final_quality_adjustment` implied) (`resizer.py`).
-- **Development Environment & CI:**
-  - Replaced `flake8` with `ruff` for linting (e.g., `ruff check .`) and added `ruff --fix` to the formatting pipeline in `Makefile`.
-  - `mypy` type checking and `black` formatting in `Makefile` now target the entire project (`.`) for broader coverage (e.g., `mypy .`, `black .`).
-  - Updated Vulture dead code detection paths in `Makefile` to include `scripts` and `tests` directories.
-  - CI pipeline (`.github/workflows/publish.yml`):
-    - `check-version` job now depends on the successful completion of the `tests` job.
-    - Enhanced GitHub Release step to update existing releases if a tag already exists, preventing errors (`gh release view "$TAG_NAME" ... else ... gh release create`).
-    - Modified `TAG_NAME` environment variable logic in the publish workflow (`inputs.version_tag || github.ref_name`).
-- **Code Quality & Readability:**
-  - Significantly improved type hinting across the codebase for better maintainability and clarity (e.g., `Optional`, `Tuple`, `Union`, `ClassVar`, `Path` in `__init__.py`, `formatter.py`, `logger.py`, `main.py`, `resizer.py`).
-  - `format_filesize` utility in `formatter.py` now gracefully handles `None` as input for file size, returning "N/A".
-- **Documentation:**
-  - Updated example usage (target size `1MB` from `250KB`) and example output in `README.md` to reflect the new resizing strategies, messages ("Trying combined scaling and quality approach...", "Combined approach success: scale=..."), and performance characteristics.
+- Update TAG_NAME assignment in GitHub Actions workflow to prioritize version_tag over github.ref_name for better release tagging
+- Adjust _adjust_to_exact_size function to remove unnecessary parameter
 
-### Fixed
+### 📚 Documentation
 
-- Improved ability to reach target file sizes for images that are initially smaller than the target, due to the new combined upscaling and quality adjustment strategy.
-- Enhanced robustness in determining output image format, particularly when the input image's format is not readily available from its metadata.
-- Ensured progress bars and colored output are correctly suppressed when not in a TTY environment (existing but reinforced by type hints and explicit checks).
+- Update README example output to reflect new image dimensions, sizes, and processing times for imgbytesizer
 
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 0.2.1 in pyproject.toml and __init__.py
+- Add requirements installation step in GitHub Actions workflow
+- Update GitHub Actions workflow to use Makefile for testing and building
+- Remove redundant test job from GitHub Actions workflow, simplifying CI process
 ## [0.2.0] - 2025-05-10
 
-### Added
+### 🚀 Features
 
-- New logging system with proper logger configuration (`logger.py`)
-- Added debug mode with `--debug` flag for detailed error information
-- Added quiet mode with `-q`/`--quiet` flag for minimal output
-- Added version display with `-v`/`--version` flag
-- Support for truncated images via `ImageFile.LOAD_TRUNCATED_IMAGES`
-- Better non-TTY terminal support (no color, no progress bars)
-- Added proper color detection for terminal output
-- Improved error handling throughout the application
-- Added development tools:
-  - vulture for dead code detection
-  - flake8 for linting
-  - mypy for type checking
-  - black for code formatting
+- Add version check script and enhance GitHub Actions workflow for dependency installation and version validation
+- Bump version to 0.2.0, add author and description, enhance logging and terminal output features
+- Add vulture ignore file, enhance Makefile for linting, and update dev dependencies
+- Update CHANGELOG for version 0.2.0, document new features, changes, and fixes
+- Improve JPEG handling in _adjust_to_exact_size function
 
-### Changed
+### 📚 Documentation
 
-- Improved CLI interface with better help messages
-- Refined image processing algorithms for better quality and speed
-- Enhanced terminal output formatting with improved progress bars
-- Better filesize formatting with consistent precision
-- Optimized quality adjustment algorithm with more efficient binary search
-- Improved format handling and normalization
-- Code refactoring for better maintainability:
-  - Split large functions into smaller, focused ones
-  - Better separation of concerns
-  - More consistent naming conventions
-- Updated dependencies in requirements-dev.txt
+- Update README with new command-line options and example output for imgbytesizer
 
-### Fixed
+### ⚙️ Miscellaneous Tasks
 
-- Fixed handling of image formats and extensions
-- Fixed potential issues with terminal width detection
-- Improved error messages for better user experience
-- Fixed image quality optimization for different formats
-- Fixed color output detection for various terminal types
+- Add Makefile for build and lint tasks, update development dependencies
+## [0.1.0] - 2025-05-09
 
-## [0.1.0] - Initial Release
+### 🚀 Features
 
-- Initial implementation of imgbytesizer
-- Basic CLI interface
-- Support for resizing images to target file sizes
-- Support for JPG, PNG, and WebP formats
-- Quality optimization for supported formats
+- Init commit with setup files
+- Enhance image resizing tool with progress indicators and detailed output
+- Add LICENSE and project metadata for imgbytesizer CLI tool
+- Add GitHub Actions workflow for automated release publishing
+- Implement core functionality for imgbytesizer CLI tool with image resizing and utility functions
+- Enhance GitHub Actions workflow to support manual version tagging and improve release asset handling
+
+### 🐛 Bug Fixes
+
+- Update Python version requirement to 3.9
+
+### 📚 Documentation
+
+- Add README.md with usage instructions, features, and examples for ImgByteSizer
+- Add CHANGELOG.md for version 0.1.0 with initial release details
+
+### ⚙️ Miscellaneous Tasks
+
+- Add .gitignore file to exclude unnecessary files from version control
+- Add VSCode extensions recommendations for Python development
+- Update dependencies to use requirements-dev.txt for development and remove outdated build dependency from requirements.txt
