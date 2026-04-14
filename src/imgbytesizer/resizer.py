@@ -18,7 +18,7 @@ from .logger import (
 from .utils import get_file_size_bytes, get_output_format, get_output_path
 
 # Allow loading truncated images
-ImageFile.LOAD_TRUNCATED_IMAGES = True
+ImageFile.LOAD_TRUNCATED_IMAGES = True  # ty: ignore[invalid-assignment]
 
 # Get logger
 logger: logging.Logger = logging.getLogger("imgbytesizer")

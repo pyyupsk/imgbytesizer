@@ -23,7 +23,7 @@ def setup_logger() -> logging.Logger:
   logger.setLevel(logging.INFO)
 
   # Create console handler
-  handler: logging.StreamHandler[TextIO] = logging.StreamHandler()  # type: ignore
+  handler: logging.StreamHandler[TextIO] = logging.StreamHandler()
   handler.setLevel(logging.INFO)
 
   # Create formatter
