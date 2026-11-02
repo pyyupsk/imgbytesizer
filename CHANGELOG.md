@@ -2,6 +2,21 @@
 
 All notable changes to imgbytesizer will be documented in this file.
 
+## [0.2.7] - 2026-11-02
+
+### 🐛 Bug Fixes
+
+- Bump pillow to 12.3.0, update uv.lock to resolve 28 dependabot vulns
+- Bump pillow to 13.0.0 and drop python 3.10 to resolve dependabot alerts (#2)
+
+### 📚 Documentation
+
+- Update CHANGELOG.md for v0.2.6
+- Switch download badge from pepy to shields.io pypistats
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump pypi-publish action to v1.14.3 for metadata 2.5 support
 ## [0.2.6] - 2026-04-14
 
 ### 🐛 Bug Fixes
