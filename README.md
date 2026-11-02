@@ -1,7 +1,7 @@
 # ImgByteSizer
 
 [![PyPI version](https://img.shields.io/pypi/v/imgbytesizer.svg)](https://pypi.org/project/imgbytesizer/)
-[![PyPI Downloads](https://static.pepy.tech/badge/imgbytesizer)](https://pepy.tech/projects/imgbytesizer)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/imgbytesizer.svg)](https://pypistats.org/packages/imgbytesizer)
 [![codecov](https://codecov.io/gh/pyyupsk/imgbytesizer/graph/badge.svg?token=GJH6N3ZAJS)](https://codecov.io/gh/pyyupsk/imgbytesizer)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pyyupsk_imgbytesizer&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pyyupsk_imgbytesizer)
 
