@@ -24,9 +24,10 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True  # ty: ignore[invalid-assignment]
 logger: logging.Logger = logging.getLogger("imgbytesizer")
 
 
-def _resolve_path(path: Union[str, Path]) -> str:
+def _resolve_path(path: str) -> str:
   """Resolve a user-supplied path to an absolute, normalized path."""
-  resolved: Path = Path(path).resolve()
+  # Resolve only the directory so a symlinked file keeps its own name and extension.
+  resolved: Path = Path(path).parent.resolve() / Path(path).name
   # Every resolved path sits under its own anchor; this is the check taint analysis expects.
   if not resolved.is_relative_to(resolved.anchor):
     raise ValueError(f"Invalid path: {path}")

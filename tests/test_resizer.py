@@ -7,7 +7,7 @@ from imgbytesizer.resizer import (
     _adjust_final_size, _adjust_to_exact_size, _apply_min_dimension_constraint,
     _binary_search_scale, _final_quality_adjustment, _find_best_quality, _handle_format_conversion,
     _try_combined_approach, _try_minimum_size, _try_quality_adjustment, _try_resizing,
-    _try_scale_with_quality, resize_to_target_filesize, _setup_image
+    _try_scale_with_quality, resize_to_target_filesize, _resolve_path, _setup_image
 )
 
 
@@ -408,3 +408,12 @@ def test_adjust_to_exact_size_padding(sample_image):
   _adjust_to_exact_size(output_path, target_size, quiet=True)
   assert os.path.getsize(output_path) == target_size
   os.remove(output_path)
+
+
+def test_resolve_path(tmp_path, monkeypatch):
+  # Relative paths become absolute; a symlinked file keeps its own name
+  monkeypatch.chdir(tmp_path)
+  (tmp_path / "target.jpg").touch()
+  (tmp_path / "out.png").symlink_to(tmp_path / "target.jpg")
+  assert _resolve_path("x.jpg") == str(tmp_path.resolve() / "x.jpg")
+  assert _resolve_path("out.png") == str(tmp_path.resolve() / "out.png")
