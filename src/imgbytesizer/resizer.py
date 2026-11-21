@@ -24,6 +24,16 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True  # ty: ignore[invalid-assignment]
 logger: logging.Logger = logging.getLogger("imgbytesizer")
 
 
+def _resolve_path(path: str) -> str:
+  """Resolve a user-supplied path to an absolute, normalized path."""
+  # Resolve only the directory so a symlinked file keeps its own name and extension.
+  resolved: Path = Path(path).parent.resolve() / Path(path).name
+  # Every resolved path sits under its own anchor; this is the check taint analysis expects.
+  if not resolved.is_relative_to(resolved.anchor):
+    raise ValueError(f"Invalid path: {path}")
+  return str(resolved)
+
+
 def _setup_image(image_path: Union[str, Path],
                  quiet: bool = False) -> Tuple[Image.Image, int, int, int]:
   """Load image and get original info."""
@@ -155,7 +165,7 @@ def resize_to_target_filesize(
 
   # Normalize format names and determine output path
   pil_format: str = get_output_format(img.format or "JPEG", format_name)
-  output_path = get_output_path(image_path, output_path, pil_format)
+  output_path = _resolve_path(get_output_path(image_path, output_path, pil_format))
 
   if not quiet:
     print_result("Format", pil_format)
